@@ -26,6 +26,7 @@
 - 消息投递状态机（`message_status`: accepted/processing/streaming/delivered/failed/aborted）
 - 重复消息幂等回放（同一 `messageId` 可重放缓存结果）
 - 历史同步接口（`GET /sessions/:sessionId/history?limit=...`）
+- Agent 列表接口（`GET /agents`）与前端会话级 agent 选择
 - 前端消息状态 UI（发送中/处理中/生成中/已送达/失败/已停止）
 - 前端会话历史自动同步（连接后、切会话、顶部上拉补拉历史）
 

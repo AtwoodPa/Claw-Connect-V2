@@ -12,6 +12,7 @@ const chatSchema = z.object({
         content: z.string().min(1),
         sessionId: z.string().min(1),
         messageId: z.string().min(1),
+        agentId: z.string().min(1).optional(),
         threadId: z.string().optional(),
         attachments: z.array(z.string().url()).optional()
     })

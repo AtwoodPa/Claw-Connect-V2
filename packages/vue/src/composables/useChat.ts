@@ -16,6 +16,7 @@ interface UseChatConfig {
   gatewayUrl: string;
   token?: string;
   sessionId?: string;
+  defaultAgentId?: string;
   reconnectMax?: number;
   reconnectDelay?: number;
   maxMessageLength?: number;
@@ -50,7 +51,7 @@ export function useChat(config: UseChatConfig) {
 
   if (config.sessionId) {
     if (!sessionStore.sessions.some((item) => item.id === config.sessionId)) {
-      sessionStore.createSession('新会话', config.sessionId);
+      sessionStore.createSession('新会话', config.sessionId, config.defaultAgentId ?? 'main');
     }
     sessionStore.selectSession(config.sessionId);
   }
@@ -63,6 +64,16 @@ export function useChat(config: UseChatConfig) {
 
   function resolveSessionId(messageId: string): string {
     return requestSessionIds.get(messageId) ?? sessionStore.currentId;
+  }
+
+  function resolveSessionAgentId(sessionId: string): string {
+    const stored = sessionStore.sessions.find((item) => item.id === sessionId)?.agentId;
+    const raw = (stored ?? config.defaultAgentId ?? 'main').trim();
+    return raw.replace(/[^a-zA-Z0-9_-]/g, '') || 'main';
+  }
+
+  function buildHistoryCacheKey(sessionId: string, agentId: string): string {
+    return `${agentId}::${sessionId}`;
   }
 
   function setUserMessageStatus(messageId: string, updates: Partial<Message>): void {
@@ -131,27 +142,33 @@ export function useChat(config: UseChatConfig) {
     append?: boolean;
     force?: boolean;
     limit?: number;
+    replace?: boolean;
   } = {}): Promise<void> {
     const sessionId = (params.sessionId ?? sessionStore.currentId).trim();
     if (!sessionId || isHistoryLoading.value) {
       return;
     }
 
-    const currentLimit = historyLimitBySession.get(sessionId) ?? defaultHistoryLimit;
+    const agentId = resolveSessionAgentId(sessionId);
+    const cacheKey = buildHistoryCacheKey(sessionId, agentId);
+
+    const currentLimit = historyLimitBySession.get(cacheKey) ?? defaultHistoryLimit;
     const requestedLimit = params.limit ?? (params.append ? currentLimit + historyStep : currentLimit);
     const limit = Math.min(Math.max(requestedLimit, 20), 300);
     const hasLocalMessages = (chatStore.messages[sessionId] ?? []).length > 0;
 
-    if (!params.force && !params.append && loadedHistorySessions.has(sessionId) && hasLocalMessages) {
+    if (!params.force && !params.append && loadedHistorySessions.has(cacheKey) && hasLocalMessages) {
       return;
     }
 
-    historyLimitBySession.set(sessionId, limit);
+    historyLimitBySession.set(cacheKey, limit);
     historyError.value = null;
     isHistoryLoading.value = true;
 
     try {
-      const response = await fetch(`${buildApiBaseUrl()}/sessions/${encodeURIComponent(sessionId)}/history?limit=${limit}`);
+      const response = await fetch(
+        `${buildApiBaseUrl()}/sessions/${encodeURIComponent(sessionId)}/history?limit=${limit}&agentId=${encodeURIComponent(agentId)}`
+      );
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -167,7 +184,11 @@ export function useChat(config: UseChatConfig) {
           status: item.role === 'user' ? 'delivered' : 'sent'
         }));
 
-      chatStore.mergeMessages(sessionId, messages);
+      if (params.replace) {
+        chatStore.setSessionMessages(sessionId, messages);
+      } else {
+        chatStore.mergeMessages(sessionId, messages);
+      }
 
       const mergedMessageCount = chatStore.messages[sessionId]?.length ?? messages.length;
       const latest = [...messages].reverse().find((item) => item.role !== 'system') ?? messages[messages.length - 1];
@@ -179,7 +200,7 @@ export function useChat(config: UseChatConfig) {
         });
       }
 
-      loadedHistorySessions.add(sessionId);
+      loadedHistorySessions.add(cacheKey);
     } catch (error) {
       historyError.value = error instanceof Error ? error.message : String(error);
     } finally {
@@ -324,6 +345,7 @@ export function useChat(config: UseChatConfig) {
     }
 
     const currentSessionId = sessionStore.currentId;
+    const currentAgentId = resolveSessionAgentId(currentSessionId);
     const requestId = createId();
 
     const imageItems = images?.map((file) => ({
@@ -359,6 +381,7 @@ export function useChat(config: UseChatConfig) {
           content: text,
           sessionId: currentSessionId,
           messageId: requestId,
+          agentId: currentAgentId,
           attachments
         }
       });

@@ -10,6 +10,7 @@ Web 端接入 OpenClaw Gateway 的 Channel 插件（WebSocket/HTTP）。
 - 分块输出协议（`chunk` / `stream_end`）
 - 消息状态协议（`message_status`）
 - 会话历史同步（`GET /sessions/:sessionId/history`）
+- Agent 列表接口（`GET /agents`）
 - 健康检查与配置检查（`/health`、`/config`）
 - 基础文件上传接口（`/upload`）
 

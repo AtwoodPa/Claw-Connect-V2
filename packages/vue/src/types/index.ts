@@ -34,6 +34,7 @@ export interface Session {
   updatedAt: number;
   lastMessage: string;
   messageCount: number;
+  agentId: string;
   pinned?: boolean;
 }
 
@@ -52,9 +53,16 @@ export interface ChatInitConfig {
   token?: string;
   sessionId?: string;
   userId?: string;
+  defaultAgentId: string;
+  agents: AgentOption[];
   locale: string;
   theme: ThemeConfig;
   options: Required<ChatOptions>;
+}
+
+export interface AgentOption {
+  id: string;
+  name: string;
 }
 
 export interface ThemeConfig {
@@ -169,9 +177,15 @@ export interface SessionHistoryPayload {
 
 export interface SessionHistoryResponse {
   sessionId: string;
+  agentId?: string;
   sessionKey: string;
   total: number;
   messages: SessionHistoryPayload[];
+}
+
+export interface AgentListResponse {
+  agents: AgentOption[];
+  defaultAgentId?: string;
 }
 
 export type WsServerMessage =
@@ -199,6 +213,7 @@ export type WsClientMessage =
         content: string;
         sessionId: string;
         messageId: string;
+        agentId?: string;
         threadId?: string;
         attachments?: string[];
       };

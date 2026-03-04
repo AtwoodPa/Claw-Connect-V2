@@ -48,6 +48,7 @@ export interface IncomingChatMessage {
         content: string;
         sessionId: string;
         messageId: string;
+        agentId?: string;
         threadId?: string;
         attachments?: string[];
     };

@@ -22,6 +22,7 @@ npm install @openclaw/web-channel-vue
 - 流式输出展示
 - 消息投递状态展示（accepted/processing/delivered/failed 等）
 - 历史消息同步（连接/切会话/上拉加载）
+- 多 Agent 会话（按会话绑定 agent，可在页面选择）
 - Markdown 渲染与代码高亮
 - 主题切换（亮色/暗色/跟随系统）
 - 中英国际化
@@ -35,3 +36,8 @@ const initConfig = createChatInitConfigFromEnv();
 ```
 
 `.env` 可参考 `.env.example`。
+
+多 Agent 初始化变量：
+
+- `VITE_OPENCLAW_DEFAULT_AGENT_ID`
+- `VITE_OPENCLAW_AGENTS`（格式：`id:name,id2:name2`）

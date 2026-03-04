@@ -13,6 +13,12 @@
       </div>
 
       <div class="oc-chat-header-actions">
+        <label class="oc-agent-picker">
+          <span>{{ t('chat.agent') }}</span>
+          <select v-model="currentAgentId" @change="handleAgentChange">
+            <option v-for="agent in availableAgents" :key="agent.id" :value="agent.id">{{ agent.name }}</option>
+          </select>
+        </label>
         <span class="oc-connection" :class="status">
           <span class="dot" />
           {{ statusText }}
@@ -30,6 +36,7 @@
         v-model:visible="showSidebar"
         :sessions="sessions"
         :current-id="currentSessionId"
+        :agent-labels="agentLabelMap"
         @select="handleSessionSelect"
         @delete="handleSessionDelete"
         @reset="handleSessionReset"
@@ -92,7 +99,7 @@ import { useChat } from '../composables/useChat.js';
 import { useTheme } from '../composables/useTheme.js';
 import { useI18n } from '../composables/useI18n.js';
 import { createChatInitConfig } from '../config/init.js';
-import type { ChatInitConfig, ChatOptions, Message, ThemeConfig } from '../types/index.js';
+import type { AgentListResponse, AgentOption, ChatInitConfig, ChatOptions, Message, ThemeConfig } from '../types/index.js';
 
 ensurePinia();
 
@@ -102,6 +109,8 @@ const props = withDefaults(
     token?: string;
     sessionId?: string;
     userId?: string;
+    defaultAgentId?: string;
+    agents?: AgentOption[];
     theme?: ThemeConfig;
     locale?: string;
     options?: ChatOptions;
@@ -112,6 +121,8 @@ const props = withDefaults(
     token: '',
     sessionId: '',
     userId: '',
+    defaultAgentId: 'main',
+    agents: () => [],
     locale: 'auto',
     options: () => ({}),
     initConfig: () => ({})
@@ -132,6 +143,8 @@ const resolvedInit = createChatInitConfig({
   token: props.token || props.initConfig?.token,
   sessionId: props.sessionId || props.initConfig?.sessionId,
   userId: props.userId || props.initConfig?.userId,
+  defaultAgentId: props.defaultAgentId || props.initConfig?.defaultAgentId,
+  agents: props.agents?.length ? props.agents : props.initConfig?.agents,
   locale: props.locale !== 'auto' ? props.locale : props.initConfig?.locale,
   theme: props.theme ?? props.initConfig?.theme,
   options: {
@@ -145,15 +158,28 @@ const sessionStore = useSessionStore();
 const { sortedSessions: sessions, currentSession } = storeToRefs(sessionStore);
 
 if (resolvedInit.sessionId && !sessionStore.sessions.some((item) => item.id === resolvedInit.sessionId)) {
-  sessionStore.createSession('新会话', resolvedInit.sessionId);
+  sessionStore.createSession('新会话', resolvedInit.sessionId, resolvedInit.defaultAgentId);
 }
 if (resolvedInit.sessionId) {
   sessionStore.selectSession(resolvedInit.sessionId);
+}
+if (!sessionStore.currentSession?.agentId) {
+  sessionStore.updateAgent(sessionStore.currentId, resolvedInit.defaultAgentId);
 }
 chatStore.setCurrentSession(sessionStore.currentId);
 
 const { t, locale, setLocale } = useI18n();
 const { isDark, toggle } = useTheme(resolvedInit.theme.mode);
+const availableAgents = ref<AgentOption[]>(
+  resolvedInit.agents.length > 0
+    ? resolvedInit.agents
+    : [
+        {
+          id: resolvedInit.defaultAgentId,
+          name: resolvedInit.defaultAgentId
+        }
+      ]
+);
 
 if (resolvedInit.locale && resolvedInit.locale !== 'auto') {
   setLocale(resolvedInit.locale);
@@ -179,6 +205,7 @@ const {
   gatewayUrl: resolvedInit.gatewayUrl,
   token: resolvedInit.token,
   sessionId: sessionStore.currentId,
+  defaultAgentId: resolvedInit.defaultAgentId,
   reconnectDelay: resolvedInit.options.reconnectDelay,
   reconnectMax: resolvedInit.options.reconnectMax,
   maxMessageLength: resolvedInit.options.maxMessageLength
@@ -189,8 +216,12 @@ const showSidebar = ref(true);
 const previewVisible = ref(false);
 const previewImage = ref('');
 const messageListRef = ref<InstanceType<typeof MessageList> | null>(null);
+const currentAgentId = ref(sessionStore.currentSession?.agentId ?? resolvedInit.defaultAgentId);
 
 const currentSessionId = computed(() => sessionStore.currentId);
+const agentLabelMap = computed<Record<string, string>>(() =>
+  Object.fromEntries(availableAgents.value.map((item) => [item.id, item.name]))
+);
 const streamingMessageId = computed(() => chatStore.streamingMessageId ?? '');
 const statusText = computed(() => {
   if (status.value === 'connected') {
@@ -201,6 +232,43 @@ const statusText = computed(() => {
   }
   return t('chat.disconnected');
 });
+
+function normalizeAgentId(agentId: string | undefined): string {
+  const raw = (agentId ?? '').trim();
+  return raw.replace(/[^a-zA-Z0-9_-]/g, '') || resolvedInit.defaultAgentId || 'main';
+}
+
+function buildApiBaseUrl(): string {
+  return resolvedInit.gatewayUrl.endsWith('/') ? resolvedInit.gatewayUrl.slice(0, -1) : resolvedInit.gatewayUrl;
+}
+
+async function syncAgents(): Promise<void> {
+  try {
+    const response = await fetch(`${buildApiBaseUrl()}/agents`);
+    if (!response.ok) {
+      return;
+    }
+
+    const payload = (await response.json()) as AgentListResponse;
+    if (!Array.isArray(payload.agents) || payload.agents.length === 0) {
+      return;
+    }
+
+    availableAgents.value = payload.agents.map((item) => ({
+      id: normalizeAgentId(item.id),
+      name: item.name?.trim() || item.id
+    }));
+    const defaultFromServer = normalizeAgentId(payload.defaultAgentId);
+
+    const current = currentAgentId.value;
+    if (!availableAgents.value.some((item) => item.id === current)) {
+      currentAgentId.value = defaultFromServer;
+      sessionStore.updateAgent(sessionStore.currentId, defaultFromServer);
+    }
+  } catch {
+    // Keep local configured agents when /agents is unavailable.
+  }
+}
 
 function handleShortcut(event: KeyboardEvent): void {
   if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'l') {
@@ -219,6 +287,7 @@ onMounted(async () => {
   window.addEventListener('keydown', handleShortcut);
   try {
     await connect();
+    await syncAgents();
     await loadHistory({ force: true });
     emit('connect');
   } catch (error) {
@@ -237,8 +306,16 @@ watch(
       return;
     }
     chatStore.setCurrentSession(next);
+
+    const targetSession = sessionStore.currentSession;
+    if (targetSession && !targetSession.agentId) {
+      sessionStore.updateAgent(next, resolvedInit.defaultAgentId);
+    }
+
+    currentAgentId.value = sessionStore.currentSession?.agentId ?? resolvedInit.defaultAgentId;
+
     emit('session-change', { sessionId: next });
-    void loadHistory({ sessionId: next });
+    void loadHistory({ sessionId: next, replace: true });
   }
 );
 
@@ -336,7 +413,7 @@ function handleSessionReset(id: string): void {
 }
 
 function handleNewSession(): void {
-  const created = sessionStore.createSession(t('chat.newSession'));
+  const created = sessionStore.createSession(t('chat.newSession'), undefined, currentAgentId.value);
   chatStore.setCurrentSession(created.id);
   if (window.innerWidth < 900) {
     showSidebar.value = false;
@@ -370,6 +447,26 @@ function loadMoreHistory(): void {
     sessionId: sessionStore.currentId,
     append: true,
     force: true
+  });
+}
+
+function handleAgentChange(): void {
+  const selected = normalizeAgentId(currentAgentId.value);
+  const currentSession = sessionStore.currentSession;
+  if (!currentSession) {
+    return;
+  }
+
+  if (currentSession.agentId === selected) {
+    return;
+  }
+
+  sessionStore.updateAgent(currentSession.id, selected);
+  chatStore.clearMessages(currentSession.id);
+  void loadHistory({
+    sessionId: currentSession.id,
+    force: true,
+    replace: true
   });
 }
 
@@ -463,6 +560,33 @@ function handleReconnect(): void {
 .oc-chat-header-actions button:hover,
 .oc-mobile-menu:hover {
   border-color: color-mix(in srgb, var(--oc-color-primary) 36%, transparent);
+}
+
+.oc-agent-picker {
+  border: 1px solid var(--oc-color-border);
+  background: color-mix(in srgb, var(--oc-color-panel) 70%, transparent);
+  color: var(--oc-color-text);
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.oc-agent-picker span {
+  color: var(--oc-color-muted);
+  font-size: 11px;
+}
+
+.oc-agent-picker select {
+  border: 0;
+  background: transparent;
+  color: var(--oc-color-text);
+  outline: none;
+  min-width: 90px;
+  max-width: 180px;
+  font-size: 12px;
 }
 
 .oc-chat-header-actions button.primary {
@@ -605,6 +729,19 @@ function handleReconnect(): void {
 
   .oc-chat-header-actions button:not(.primary) {
     display: none;
+  }
+
+  .oc-agent-picker {
+    padding: 0 8px;
+  }
+
+  .oc-agent-picker span {
+    display: none;
+  }
+
+  .oc-agent-picker select {
+    min-width: 74px;
+    max-width: 120px;
   }
 }
 </style>

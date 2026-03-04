@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
-import { mkdir } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { mkdir, readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { join } from 'node:path';
 import cors from 'cors';
 import express from 'express';
@@ -33,6 +35,13 @@ function parsePositiveInt(value, fallback, min, max) {
     }
     return Math.min(max, Math.max(min, Math.floor(numeric)));
 }
+function normalizeAgentId(agentId) {
+    const normalized = (agentId ?? '').trim();
+    if (!normalized) {
+        return 'main';
+    }
+    return normalized.replace(/[^a-zA-Z0-9_-]/g, '') || 'main';
+}
 export class WebChannelServer {
     config;
     api;
@@ -45,6 +54,7 @@ export class WebChannelServer {
     inflightSessionKeys = new Map();
     abortedMessageIds = new Set();
     completedResponses = new Map();
+    agentListCache = null;
     gatewayClient;
     constructor(config, api, options) {
         this.config = config;
@@ -82,7 +92,8 @@ export class WebChannelServer {
                     markdown: true,
                     messageStatus: true,
                     historySync: true,
-                    retry: true
+                    retry: true,
+                    agentSelection: true
                 },
                 limits: {
                     maxMessageLength: this.config.limits.maxMessageLength,
@@ -91,6 +102,23 @@ export class WebChannelServer {
                 }
             });
         });
+        this.app.get('/agents', async (_req, res) => {
+            try {
+                const agents = await this.loadAvailableAgents();
+                const defaultAgentId = agents.some((item) => item.id === 'main') ? 'main' : (agents[0]?.id ?? 'main');
+                res.json({
+                    agents,
+                    defaultAgentId
+                });
+            }
+            catch (error) {
+                this.api.logger.warn('Failed to resolve agent list', { error });
+                res.status(500).json(createErrorPayload('AGENT_001', 'Failed to load agents', {
+                    recoverable: true,
+                    action: 'retry'
+                }));
+            }
+        });
         this.app.get('/sessions/:sessionId/history', async (req, res) => {
             const sessionId = String(req.params.sessionId ?? '').trim();
             if (!sessionId) {
@@ -98,7 +126,9 @@ export class WebChannelServer {
                 return;
             }
             const limit = parsePositiveInt(req.query.limit, 100, 1, 300);
-            const sessionKey = this.resolveGatewaySessionKeyFromSessionId(sessionId);
+            const queryAgent = typeof req.query.agentId === 'string' ? req.query.agentId : undefined;
+            const agentId = normalizeAgentId(queryAgent);
+            const sessionKey = this.resolveGatewaySessionKeyFromSessionId(sessionId, agentId);
             try {
                 const history = await this.gatewayClient.loadHistory({
                     sessionKey,
@@ -106,6 +136,7 @@ export class WebChannelServer {
                 });
                 res.json({
                     sessionId,
+                    agentId,
                     sessionKey,
                     messages: history.messages,
                     total: history.messages.length
@@ -206,6 +237,155 @@ export class WebChannelServer {
                 this.api.logger.error(`WebSocket error (${client.id})`, { error: error.message });
             });
         });
+    }
+    parseAgentList(output) {
+        const agents = [];
+        const seen = new Set();
+        let inAgentsSection = false;
+        for (const line of output.split(/\r?\n/)) {
+            const cleaned = line.replace(/\u001b\[[0-9;]*m/g, '');
+            const trimmed = cleaned.trim();
+            if (!trimmed) {
+                continue;
+            }
+            if (trimmed.startsWith('Agents:')) {
+                inAgentsSection = true;
+                continue;
+            }
+            if (!inAgentsSection) {
+                continue;
+            }
+            if (!trimmed.startsWith('- ')) {
+                if (trimmed.startsWith('Routing rules')) {
+                    break;
+                }
+                continue;
+            }
+            const entry = trimmed.slice(2).trim();
+            const idMatch = entry.match(/^([a-zA-Z0-9_-]+)/);
+            if (!idMatch) {
+                continue;
+            }
+            const id = normalizeAgentId(idMatch[1]);
+            if (!id || seen.has(id)) {
+                continue;
+            }
+            const nameMatch = entry.match(/\(([^)]+)\)/);
+            const rawName = nameMatch?.[1]?.trim();
+            const name = rawName && rawName !== 'default' ? rawName : id;
+            agents.push({ id, name });
+            seen.add(id);
+        }
+        if (!seen.has('main')) {
+            agents.unshift({ id: 'main', name: 'main' });
+        }
+        return agents;
+    }
+    parseAgentListFromConfig(raw) {
+        const parsed = JSON.parse(raw);
+        const list = parsed.agents?.list ?? [];
+        const dedup = new Map();
+        for (const item of list) {
+            const id = normalizeAgentId(item.id);
+            if (!id) {
+                continue;
+            }
+            dedup.set(id, {
+                id,
+                name: (item.name ?? '').trim() || id
+            });
+        }
+        if (!dedup.has('main')) {
+            dedup.set('main', { id: 'main', name: 'main' });
+        }
+        return [...dedup.values()];
+    }
+    async loadAgentsFromConfigFile() {
+        const candidates = [process.env.OPENCLAW_CONFIG_PATH, process.env.OPENCLAW_CONFIG, join(homedir(), '.openclaw', 'openclaw.json')]
+            .filter((item) => typeof item === 'string' && item.trim().length > 0)
+            .map((item) => item.trim());
+        for (const configPath of candidates) {
+            try {
+                const raw = await readFile(configPath, 'utf8');
+                const agents = this.parseAgentListFromConfig(raw);
+                if (agents.length > 0) {
+                    return agents;
+                }
+            }
+            catch {
+                // Try next candidate path.
+            }
+        }
+        return [{ id: 'main', name: 'main' }];
+    }
+    async runOpenClawCommand(args, timeoutMs) {
+        return new Promise((resolve, reject) => {
+            const child = spawn('openclaw', args, {
+                env: {
+                    ...process.env,
+                    NO_COLOR: '1',
+                    CLICOLOR: '0',
+                    FORCE_COLOR: '0'
+                },
+                stdio: ['ignore', 'pipe', 'pipe']
+            });
+            let stdout = '';
+            let stderr = '';
+            let timedOut = false;
+            const timer = setTimeout(() => {
+                timedOut = true;
+                child.kill('SIGTERM');
+                setTimeout(() => child.kill('SIGKILL'), 500).unref();
+            }, timeoutMs);
+            child.stdout.setEncoding('utf8');
+            child.stdout.on('data', (chunk) => {
+                stdout += chunk;
+            });
+            child.stderr.setEncoding('utf8');
+            child.stderr.on('data', (chunk) => {
+                stderr += chunk;
+            });
+            child.on('error', (error) => {
+                clearTimeout(timer);
+                reject(error);
+            });
+            child.on('close', (code) => {
+                clearTimeout(timer);
+                if (timedOut) {
+                    reject(new Error('openclaw agents list timed out'));
+                    return;
+                }
+                if (code !== 0) {
+                    reject(new Error(stderr.trim() || stdout.trim() || 'openclaw command failed'));
+                    return;
+                }
+                resolve(`${stdout}\n${stderr}`);
+            });
+        });
+    }
+    async loadAvailableAgents() {
+        const now = Date.now();
+        if (this.agentListCache && this.agentListCache.expiresAt > now) {
+            return this.agentListCache.data;
+        }
+        let agents = await this.loadAgentsFromConfigFile();
+        if (agents.length <= 1) {
+            try {
+                const output = await this.runOpenClawCommand(['agents', 'list'], 10_000);
+                const parsed = this.parseAgentList(output);
+                if (parsed.length > agents.length) {
+                    agents = parsed;
+                }
+            }
+            catch (error) {
+                this.api.logger.warn('Fallback agent list from CLI failed', { error });
+            }
+        }
+        this.agentListCache = {
+            data: agents,
+            expiresAt: now + 30_000
+        };
+        return agents;
     }
     sendMessageStatus(client, messageId, status, extra) {
         client.ws.send(JSON.stringify({
@@ -359,20 +539,21 @@ export class WebChannelServer {
                 client.ws.send(JSON.stringify(createErrorPayload('MSG_002', 'Unsupported message type')));
         }
     }
-    resolveGatewaySessionKey(sessionOrId, fallbackSessionId) {
+    resolveGatewaySessionKey(sessionOrId, fallbackSessionId, agentId) {
         const rawSession = (sessionOrId || fallbackSessionId || 'default').trim();
         if (rawSession.startsWith('agent:')) {
             return rawSession;
         }
         const sanitized = rawSession.replace(/[^a-zA-Z0-9:_-]/g, '-');
         const suffix = sanitized || fallbackSessionId;
-        return `agent:main:web-${suffix}`;
+        const normalizedAgent = normalizeAgentId(agentId);
+        return `agent:${normalizedAgent}:web-${suffix}`;
     }
-    resolveGatewaySessionKeyForClient(client, providedSessionId) {
-        return this.resolveGatewaySessionKey(providedSessionId ?? client.sessionId, client.sessionId);
+    resolveGatewaySessionKeyForClient(client, providedSessionId, agentId) {
+        return this.resolveGatewaySessionKey(providedSessionId ?? client.sessionId, client.sessionId, agentId);
     }
-    resolveGatewaySessionKeyFromSessionId(sessionId) {
-        return this.resolveGatewaySessionKey(sessionId, sessionId);
+    resolveGatewaySessionKeyFromSessionId(sessionId, agentId) {
+        return this.resolveGatewaySessionKey(sessionId, sessionId, agentId);
     }
     async handleChatMessage(client, message) {
         if (!client.isAuthenticated && !this.config.auth.allowAnonymous) {
@@ -410,7 +591,7 @@ export class WebChannelServer {
             });
             return;
         }
-        const gatewaySessionKey = this.resolveGatewaySessionKeyForClient(client, message.payload.sessionId);
+        const gatewaySessionKey = this.resolveGatewaySessionKeyForClient(client, message.payload.sessionId, message.payload.agentId);
         this.inflightMessageIds.add(messageId);
         this.inflightSessionKeys.set(messageId, gatewaySessionKey);
         client.ws.send(JSON.stringify({

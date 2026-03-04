@@ -29,7 +29,10 @@
             <span v-if="session.pinned" class="oc-pin">📌</span>
             {{ session.title }}
           </span>
-          <span class="oc-session-time">{{ formatSessionTime(session.updatedAt, locale) }}</span>
+          <div class="oc-session-meta">
+            <span class="oc-session-agent">{{ resolveAgentLabel(session.agentId) }}</span>
+            <span class="oc-session-time">{{ formatSessionTime(session.updatedAt, locale) }}</span>
+          </div>
         </div>
 
         <div class="oc-session-sub">
@@ -56,9 +59,11 @@ const props = withDefaults(
   defineProps<{
     sessions: Session[];
     currentId: string;
+    agentLabels?: Record<string, string>;
     visible?: boolean;
   }>(),
   {
+    agentLabels: () => ({}),
     visible: true
   }
 );
@@ -97,6 +102,13 @@ function handleSelect(id: string): void {
   if (window.innerWidth < 900) {
     emit('update:visible', false);
   }
+}
+
+function resolveAgentLabel(agentId: string): string {
+  if (props.agentLabels[agentId]) {
+    return props.agentLabels[agentId];
+  }
+  return agentId;
 }
 </script>
 
@@ -189,6 +201,25 @@ function handleSelect(id: string): void {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+}
+
+.oc-session-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.oc-session-agent {
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 84%, transparent);
+  color: var(--oc-color-muted);
+  font-size: 10px;
+  border-radius: 999px;
+  padding: 0 6px;
+  line-height: 18px;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .oc-session-title {

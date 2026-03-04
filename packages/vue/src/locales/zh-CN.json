@@ -2,6 +2,7 @@
   "chat": {
     "title": "OpenClaw 对话",
     "newSession": "新建会话",
+    "agent": "Agent",
     "disconnected": "连接已断开",
     "reconnect": "重连",
     "empty": "开始和 OpenClaw 对话"

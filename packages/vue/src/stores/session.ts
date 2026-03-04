@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import type { Session } from '../types/index.js';
 
-function createSessionItem(title: string, id?: string): Session {
+function createSessionItem(title: string, id?: string, agentId = 'main'): Session {
   const sessionId = id ?? (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}`);
   return {
     id: sessionId,
@@ -9,6 +9,7 @@ function createSessionItem(title: string, id?: string): Session {
     updatedAt: Date.now(),
     lastMessage: '',
     messageCount: 0,
+    agentId,
     pinned: false
   };
 }
@@ -21,7 +22,7 @@ interface SessionState {
 
 export const useSessionStore = defineStore('session', {
   state: (): SessionState => {
-    const initial = createSessionItem('新会话', 'default');
+    const initial = createSessionItem('新会话', 'default', 'main');
     return {
       sessions: [initial],
       currentId: initial.id,
@@ -53,8 +54,8 @@ export const useSessionStore = defineStore('session', {
     }
   },
   actions: {
-    createSession(title = '新会话', id?: string): Session {
-      const session = createSessionItem(title, id);
+    createSession(title = '新会话', id?: string, agentId = 'main'): Session {
+      const session = createSessionItem(title, id, agentId);
       this.sessions.unshift(session);
       this.currentId = session.id;
       return session;
@@ -83,6 +84,17 @@ export const useSessionStore = defineStore('session', {
       }
       target.title = title.slice(0, 50);
       target.updatedAt = Date.now();
+    },
+    updateAgent(id: string, agentId: string): void {
+      const target = this.sessions.find((item) => item.id === id);
+      if (!target) {
+        return;
+      }
+
+      const normalized = (agentId || 'main').trim().replace(/[^a-zA-Z0-9_-]/g, '') || 'main';
+      target.agentId = normalized;
+      target.updatedAt = Date.now();
+      this.reorderSessions();
     },
     pinSession(id: string, pinned: boolean): void {
       const target = this.sessions.find((item) => item.id === id);

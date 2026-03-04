@@ -18,10 +18,16 @@ export declare class WebChannelServer {
     private readonly inflightSessionKeys;
     private readonly abortedMessageIds;
     private readonly completedResponses;
+    private agentListCache;
     private readonly gatewayClient;
     constructor(config: PluginConfig, api: OpenClawPluginApi, options?: WebChannelServerOptions);
     private setupRoutes;
     private setupWebSocket;
+    private parseAgentList;
+    private parseAgentListFromConfig;
+    private loadAgentsFromConfigFile;
+    private runOpenClawCommand;
+    private loadAvailableAgents;
     private sendMessageStatus;
     private rememberCompletedResponse;
     private replayCachedResponse;
