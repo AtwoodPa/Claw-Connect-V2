@@ -1,0 +1,17 @@
+:root[data-openclaw-theme='light'] {
+  --oc-color-primary: #0f766e;
+  --oc-color-primary-strong: #0a4f4b;
+  --oc-color-primary-soft: #d7f2ee;
+
+  --oc-color-bg: #edf3f2;
+  --oc-color-panel: #ffffff;
+  --oc-color-panel-elevated: #f9fcfb;
+  --oc-color-border: #d2dfdc;
+
+  --oc-color-text: #152524;
+  --oc-color-muted: #5f7976;
+  --oc-color-user-bubble: linear-gradient(135deg, #0f766e, #11857d);
+  --oc-color-user-text: #ffffff;
+  --oc-color-assistant-bubble: #f2f8f6;
+  --oc-color-system-text: #607a77;
+}

@@ -1,0 +1,47 @@
+{
+  "chat": {
+    "title": "OpenClaw 对话",
+    "newSession": "新建会话",
+    "disconnected": "连接已断开",
+    "reconnect": "重连",
+    "empty": "开始和 OpenClaw 对话"
+  },
+  "input": {
+    "placeholder": "输入消息...",
+    "thinking": "思考中...",
+    "stop": "停止",
+    "queued": "等待发送: {count}"
+  },
+  "session": {
+    "title": "会话",
+    "empty": "暂无会话",
+    "delete": "删除",
+    "clear": "清空",
+    "new": "新建"
+  },
+  "message": {
+    "you": "你",
+    "assistant": "助手",
+    "system": "系统",
+    "copy": "复制",
+    "copied": "已复制",
+    "quote": "引用",
+    "delete": "删除",
+    "regenerate": "重新生成",
+    "status": {
+      "pending": "待发送",
+      "accepted": "已接收",
+      "processing": "处理中",
+      "streaming": "生成中",
+      "delivered": "已送达",
+      "failed": "发送失败",
+      "aborted": "已停止",
+      "sent": "已发送"
+    }
+  },
+  "status": {
+    "connected": "已连接",
+    "reconnecting": "重连中",
+    "error": "连接失败"
+  }
+}

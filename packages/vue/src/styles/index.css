@@ -1,0 +1,30 @@
+@import './variables.css';
+@import './themes/light.css';
+@import './themes/dark.css';
+
+.openclaw-chat,
+.openclaw-chat * {
+  box-sizing: border-box;
+}
+
+.openclaw-chat {
+  font-family: var(--oc-font-family);
+  color: var(--oc-color-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.openclaw-chat button,
+.openclaw-chat input,
+.openclaw-chat textarea {
+  font: inherit;
+}
+
+.openclaw-chat button {
+  transition: transform var(--oc-transition), background var(--oc-transition), border-color var(--oc-transition),
+    color var(--oc-transition), box-shadow var(--oc-transition);
+}
+
+.openclaw-chat button:active {
+  transform: translateY(1px);
+}

@@ -1,0 +1,47 @@
+{
+  "chat": {
+    "title": "OpenClaw Chat",
+    "newSession": "New session",
+    "disconnected": "Disconnected",
+    "reconnect": "Reconnect",
+    "empty": "Start chatting with OpenClaw"
+  },
+  "input": {
+    "placeholder": "Type your message...",
+    "thinking": "Thinking...",
+    "stop": "Stop",
+    "queued": "Queued: {count}"
+  },
+  "session": {
+    "title": "Sessions",
+    "empty": "No sessions",
+    "delete": "Delete",
+    "clear": "Clear",
+    "new": "New"
+  },
+  "message": {
+    "you": "You",
+    "assistant": "Assistant",
+    "system": "System",
+    "copy": "Copy",
+    "copied": "Copied",
+    "quote": "Quote",
+    "delete": "Delete",
+    "regenerate": "Regenerate",
+    "status": {
+      "pending": "Queued",
+      "accepted": "Accepted",
+      "processing": "Processing",
+      "streaming": "Streaming",
+      "delivered": "Delivered",
+      "failed": "Failed",
+      "aborted": "Stopped",
+      "sent": "Sent"
+    }
+  },
+  "status": {
+    "connected": "Connected",
+    "reconnecting": "Reconnecting",
+    "error": "Connection failed"
+  }
+}
