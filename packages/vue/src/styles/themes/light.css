@@ -1,17 +1,18 @@
 :root[data-openclaw-theme='light'] {
-  --oc-color-primary: #0f766e;
-  --oc-color-primary-strong: #0a4f4b;
-  --oc-color-primary-soft: #d7f2ee;
+  --oc-color-primary: #3b82f6;
+  --oc-color-primary-strong: #1d4ed8;
+  --oc-color-primary-soft: #dbeafe;
+  --oc-color-accent: #8b5cf6;
 
-  --oc-color-bg: #edf3f2;
+  --oc-color-bg: #f2f6ff;
   --oc-color-panel: #ffffff;
-  --oc-color-panel-elevated: #f9fcfb;
-  --oc-color-border: #d2dfdc;
+  --oc-color-panel-elevated: #f7f9ff;
+  --oc-color-border: #d4deef;
 
-  --oc-color-text: #152524;
-  --oc-color-muted: #5f7976;
-  --oc-color-user-bubble: linear-gradient(135deg, #0f766e, #11857d);
+  --oc-color-text: #0f172a;
+  --oc-color-muted: #5b6b86;
+  --oc-color-user-bubble: linear-gradient(135deg, #2563eb, #4f46e5);
   --oc-color-user-text: #ffffff;
-  --oc-color-assistant-bubble: #f2f8f6;
-  --oc-color-system-text: #607a77;
+  --oc-color-assistant-bubble: #f3f7ff;
+  --oc-color-system-text: #64748b;
 }

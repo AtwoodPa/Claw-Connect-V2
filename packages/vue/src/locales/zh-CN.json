@@ -10,6 +10,7 @@
   "input": {
     "placeholder": "输入消息...",
     "thinking": "思考中...",
+    "send": "发送",
     "stop": "停止",
     "queued": "等待发送: {count}"
   },

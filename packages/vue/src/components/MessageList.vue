@@ -19,7 +19,11 @@
       />
     </TransitionGroup>
 
-    <div v-if="loading && !streaming" class="oc-loading">...</div>
+    <div v-if="loading && !streaming" class="oc-loading">
+      <span />
+      <span />
+      <span />
+    </div>
 
     <button v-if="showScrollBottom" type="button" class="oc-scroll-btn" @click="scrollToBottom('smooth')">
       ↓ New
@@ -124,68 +128,89 @@ defineExpose({
 .oc-message-list {
   position: relative;
   overflow-y: auto;
-  padding: 18px;
+  padding: 18px 20px 24px;
   display: grid;
   align-content: start;
-  gap: 14px;
+  gap: 16px;
   background:
-    radial-gradient(circle at 78% 3%, color-mix(in srgb, var(--oc-color-primary) 18%, transparent), transparent 24%),
-    radial-gradient(circle at 20% 96%, color-mix(in srgb, var(--oc-color-primary) 10%, transparent), transparent 26%),
-    linear-gradient(180deg, color-mix(in srgb, var(--oc-color-bg) 78%, white 22%), var(--oc-color-bg));
+    radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--oc-color-primary) 18%, transparent), transparent 28%),
+    radial-gradient(circle at 10% 100%, color-mix(in srgb, var(--oc-color-accent) 14%, transparent), transparent 34%),
+    linear-gradient(180deg, color-mix(in srgb, var(--oc-color-bg) 84%, var(--oc-color-panel) 16%), var(--oc-color-bg));
 }
 
 .oc-message-stack {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .oc-empty-state {
-  margin: 28px auto;
+  margin: 30px auto;
   text-align: center;
   color: var(--oc-color-muted);
-  background: color-mix(in srgb, var(--oc-color-panel) 86%, transparent);
-  border: 1px solid var(--oc-color-border);
+  background: color-mix(in srgb, var(--oc-color-panel) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 84%, transparent);
   border-radius: var(--oc-radius);
-  padding: 18px;
-  max-width: 420px;
+  padding: 20px;
+  max-width: 460px;
   box-shadow: var(--oc-shadow-sm);
 }
 
 .oc-empty-state h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   color: var(--oc-color-text);
 }
 
 .oc-empty-state p {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   font-size: 13px;
 }
 
 .oc-empty-state code {
   font-size: 12px;
-  background: color-mix(in srgb, var(--oc-color-primary-soft) 70%, transparent);
-  padding: 2px 6px;
+  background: color-mix(in srgb, var(--oc-color-primary-soft) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oc-color-primary) 18%, transparent);
+  padding: 2px 7px;
   border-radius: 999px;
 }
 
 .oc-loading {
   color: var(--oc-color-muted);
   padding: 0 8px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.oc-loading span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--oc-color-primary) 52%, transparent);
+  animation: oc-bounce 1.1s ease-in-out infinite;
+}
+
+.oc-loading span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.oc-loading span:nth-child(3) {
+  animation-delay: 240ms;
 }
 
 .oc-scroll-btn {
-  position: sticky;
+  position: fixed;
   bottom: 18px;
-  margin-left: auto;
-  min-width: 74px;
-  height: 34px;
+  right: 24px;
+  min-width: 86px;
+  height: 36px;
   border-radius: 999px;
-  border: 0;
+  border: 1px solid color-mix(in srgb, var(--oc-color-primary) 28%, transparent);
   cursor: pointer;
-  color: #fff;
-  background: var(--oc-color-primary);
-  box-shadow: 0 12px 20px color-mix(in srgb, var(--oc-color-primary) 45%, transparent);
+  color: #eef4ff;
+  background: linear-gradient(135deg, var(--oc-color-primary), color-mix(in srgb, var(--oc-color-primary) 58%, #312e81));
+  box-shadow: 0 18px 28px color-mix(in srgb, var(--oc-color-primary) 42%, transparent);
+  z-index: 30;
 }
 
 .oc-message-enter-active,
@@ -201,5 +226,28 @@ defineExpose({
 
 .oc-message-move {
   transition: transform var(--oc-transition);
+}
+
+@keyframes oc-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .oc-message-list {
+    padding: 14px 12px 18px;
+  }
+
+  .oc-scroll-btn {
+    right: 14px;
+    bottom: 14px;
+  }
 }
 </style>

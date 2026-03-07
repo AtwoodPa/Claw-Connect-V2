@@ -1,5 +1,6 @@
 <template>
   <section class="openclaw-chat oc-chat-shell" :class="{ 'is-dark': isDark }">
+    <div class="oc-grid-overlay" />
     <div class="oc-bg-orb oc-bg-orb-a" />
     <div class="oc-bg-orb oc-bg-orb-b" />
 
@@ -8,42 +9,66 @@
         <button type="button" class="oc-mobile-menu" aria-label="Toggle sessions" @click="showSidebar = !showSidebar">☰</button>
         <div class="oc-title-block">
           <strong>{{ currentSession?.title || t('chat.title') }}</strong>
-          <p>Web Channel · {{ statusText }}</p>
+          <p>{{ currentAgentName }} · Web Channel</p>
         </div>
       </div>
 
       <div class="oc-chat-header-actions">
-        <label class="oc-agent-picker">
-          <span>{{ t('chat.agent') }}</span>
-          <select v-model="currentAgentId" @change="handleAgentChange">
-            <option v-for="agent in availableAgents" :key="agent.id" :value="agent.id">{{ agent.name }}</option>
-          </select>
-        </label>
         <span class="oc-connection" :class="status">
           <span class="dot" />
           {{ statusText }}
         </span>
-        <button type="button" @click="toggle">{{ isDark ? 'Light' : 'Dark' }}</button>
-        <button type="button" @click="switchLocale">{{ locale === 'zh-CN' ? 'EN' : '中文' }}</button>
-        <button type="button" class="primary" @click="handleNewSession">{{ t('chat.newSession') }}</button>
+        <button type="button" class="oc-pill-btn" @click="toggle">{{ isDark ? 'Light' : 'Dark' }}</button>
+        <button type="button" class="oc-pill-btn" @click="switchLocale">{{ locale === 'zh-CN' ? 'EN' : '中文' }}</button>
+        <button type="button" class="oc-pill-btn primary" @click="handleNewSession">{{ t('chat.newSession') }}</button>
       </div>
     </header>
 
     <div class="oc-chat-body">
       <div v-if="showSidebar" class="oc-sidebar-mask" @click="showSidebar = false" />
 
-      <SessionList
-        v-model:visible="showSidebar"
-        :sessions="sessions"
-        :current-id="currentSessionId"
-        :agent-labels="agentLabelMap"
-        @select="handleSessionSelect"
-        @delete="handleSessionDelete"
-        @reset="handleSessionReset"
-        @new="handleNewSession"
-      />
+      <div class="oc-left-zone" :class="{ hidden: !showSidebar }">
+        <aside class="oc-agent-rail">
+          <div class="oc-agent-rail-head">AG</div>
+          <div class="oc-agent-list">
+            <button
+              v-for="agent in availableAgents"
+              :key="agent.id"
+              type="button"
+              class="oc-agent-item"
+              :class="{ active: currentAgentId === agent.id }"
+              :title="agent.name"
+              @click="selectAgent(agent.id)"
+            >
+              <span class="oc-agent-avatar">{{ agent.name.slice(0, 2).toUpperCase() }}</span>
+              <span class="oc-agent-dot" />
+            </button>
+          </div>
+        </aside>
+
+        <SessionList
+          v-model:visible="showSidebar"
+          :sessions="sessions"
+          :current-id="currentSessionId"
+          :agent-labels="agentLabelMap"
+          @select="handleSessionSelect"
+          @delete="handleSessionDelete"
+          @reset="handleSessionReset"
+          @new="handleNewSession"
+        />
+      </div>
 
       <main class="oc-chat-main">
+        <div class="oc-main-topbar">
+          <label class="oc-agent-picker">
+            <span>{{ t('chat.agent') }}</span>
+            <select v-model="currentAgentId" @change="handleAgentChange">
+              <option v-for="agent in availableAgents" :key="agent.id" :value="agent.id">{{ agent.name }}</option>
+            </select>
+          </label>
+          <p class="oc-shortcuts">⌘/Ctrl+B · ⌘/Ctrl+Shift+L</p>
+        </div>
+
         <MessageList
           ref="messageListRef"
           :messages="messages"
@@ -222,6 +247,7 @@ const currentSessionId = computed(() => sessionStore.currentId);
 const agentLabelMap = computed<Record<string, string>>(() =>
   Object.fromEntries(availableAgents.value.map((item) => [item.id, item.name]))
 );
+const currentAgentName = computed(() => agentLabelMap.value[currentAgentId.value] ?? currentAgentId.value);
 const streamingMessageId = computed(() => chatStore.streamingMessageId ?? '');
 const statusText = computed(() => {
   if (status.value === 'connected') {
@@ -470,6 +496,11 @@ function handleAgentChange(): void {
   });
 }
 
+function selectAgent(agentId: string): void {
+  currentAgentId.value = normalizeAgentId(agentId);
+  handleAgentChange();
+}
+
 function switchLocale(): void {
   setLocale(locale.value === 'zh-CN' ? 'en' : 'zh-CN');
 }
@@ -482,10 +513,13 @@ function handleReconnect(): void {
 <style scoped>
 .oc-chat-shell {
   width: 100%;
-  min-height: 640px;
-  border-radius: 20px;
-  border: 1px solid var(--oc-color-border);
-  background: var(--oc-color-bg);
+  min-height: 680px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 90%, transparent);
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--oc-color-primary) 14%, transparent), transparent 42%),
+    radial-gradient(circle at 88% 100%, color-mix(in srgb, var(--oc-color-accent) 12%, transparent), transparent 36%),
+    var(--oc-color-bg);
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -493,85 +527,242 @@ function handleReconnect(): void {
   box-shadow: var(--oc-shadow-md);
 }
 
+.oc-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--oc-color-border) 24%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--oc-color-border) 24%, transparent) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.28;
+  mask-image: linear-gradient(180deg, transparent, #000 20%, #000 80%, transparent);
+}
+
 .oc-bg-orb {
   position: absolute;
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  filter: blur(54px);
-  opacity: 0.28;
+  filter: blur(62px);
+  opacity: 0.36;
   pointer-events: none;
 }
 
 .oc-bg-orb-a {
   top: -180px;
   right: -120px;
-  background: color-mix(in srgb, var(--oc-color-primary) 65%, transparent);
+  background: color-mix(in srgb, var(--oc-color-primary) 74%, transparent);
 }
 
 .oc-bg-orb-b {
   bottom: -180px;
   left: -120px;
-  background: color-mix(in srgb, var(--oc-color-primary) 35%, transparent);
+  background: color-mix(in srgb, var(--oc-color-accent) 66%, transparent);
 }
 
 .oc-chat-header {
-  height: 64px;
-  border-bottom: 1px solid var(--oc-color-border);
-  background: color-mix(in srgb, var(--oc-color-panel) 90%, transparent);
-  backdrop-filter: blur(8px);
+  min-height: 68px;
+  border-bottom: 1px solid color-mix(in srgb, var(--oc-color-border) 86%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel) 84%, transparent);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 0 14px;
+  gap: 12px;
+  padding: 12px 16px;
   position: relative;
-  z-index: 2;
+  z-index: 20;
 }
 
 .oc-chat-header-main,
 .oc-chat-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .oc-title-block {
   display: grid;
+  gap: 2px;
 }
 
 .oc-title-block p {
-  margin: 1px 0 0;
+  margin: 0;
   color: var(--oc-color-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
-.oc-chat-header-actions button,
 .oc-mobile-menu {
-  border: 1px solid var(--oc-color-border);
-  background: color-mix(in srgb, var(--oc-color-panel) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 92%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 72%, transparent);
   color: var(--oc-color-text);
-  height: 32px;
-  padding: 0 11px;
+  height: 36px;
+  padding: 0 12px;
   border-radius: 999px;
   cursor: pointer;
 }
 
-.oc-chat-header-actions button:hover,
+.oc-mobile-menu {
+  display: none;
+}
+
+.oc-pill-btn {
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 90%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 76%, transparent);
+  color: var(--oc-color-text);
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.oc-pill-btn:hover,
 .oc-mobile-menu:hover {
-  border-color: color-mix(in srgb, var(--oc-color-primary) 36%, transparent);
+  border-color: color-mix(in srgb, var(--oc-color-primary) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--oc-color-primary) 10%, transparent);
+}
+
+.oc-pill-btn.primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--oc-color-primary), color-mix(in srgb, var(--oc-color-primary) 55%, #312e81));
+  color: #f8fbff;
+}
+
+.oc-chat-body {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  position: relative;
+  z-index: 2;
+}
+
+.oc-left-zone {
+  display: grid;
+  grid-template-columns: 76px minmax(260px, 320px);
+  min-height: 0;
+  background: color-mix(in srgb, var(--oc-color-panel) 74%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--oc-color-border) 82%, transparent);
+}
+
+.oc-left-zone.hidden {
+  display: none;
+}
+
+.oc-left-zone :deep(.oc-session-list) {
+  width: 100%;
+  min-width: 0;
+  border-right: 0;
+  border-left: 1px solid color-mix(in srgb, var(--oc-color-border) 74%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel) 62%, transparent);
+}
+
+.oc-agent-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--oc-color-panel) 82%, transparent), color-mix(in srgb, var(--oc-color-panel-elevated) 82%, transparent));
+}
+
+.oc-agent-rail-head {
+  width: 44px;
+  height: 44px;
+  margin-top: 12px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #e8f0ff;
+  background: linear-gradient(135deg, var(--oc-color-primary), var(--oc-color-accent));
+  box-shadow: 0 16px 24px color-mix(in srgb, var(--oc-color-primary) 32%, transparent);
+}
+
+.oc-agent-list {
+  margin-top: 14px;
+  padding: 4px 6px 12px;
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.oc-agent-item {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  min-height: 52px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.oc-agent-item:hover {
+  background: color-mix(in srgb, var(--oc-color-panel) 74%, transparent);
+  border-color: color-mix(in srgb, var(--oc-color-border) 85%, transparent);
+}
+
+.oc-agent-item.active {
+  border-color: color-mix(in srgb, var(--oc-color-primary) 44%, transparent);
+  background: color-mix(in srgb, var(--oc-color-primary-soft) 60%, transparent);
+}
+
+.oc-agent-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #f8fbff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--oc-color-primary) 90%, #fff), color-mix(in srgb, var(--oc-color-accent) 90%, #fff));
+}
+
+.oc-agent-dot {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid color-mix(in srgb, var(--oc-color-panel) 95%, transparent);
+}
+
+.oc-chat-main {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+}
+
+.oc-main-topbar {
+  min-height: 48px;
+  padding: 8px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--oc-color-border) 70%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel) 66%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .oc-agent-picker {
-  border: 1px solid var(--oc-color-border);
-  background: color-mix(in srgb, var(--oc-color-panel) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 86%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 80%, transparent);
   color: var(--oc-color-text);
   height: 32px;
   padding: 0 10px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .oc-agent-picker span {
@@ -584,34 +775,15 @@ function handleReconnect(): void {
   background: transparent;
   color: var(--oc-color-text);
   outline: none;
-  min-width: 90px;
-  max-width: 180px;
+  min-width: 110px;
+  max-width: 220px;
   font-size: 12px;
 }
 
-.oc-chat-header-actions button.primary {
-  background: var(--oc-color-primary);
-  border-color: transparent;
-  color: #fff;
-}
-
-.oc-mobile-menu {
-  display: none;
-}
-
-.oc-chat-body {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  position: relative;
-  z-index: 1;
-}
-
-.oc-chat-main {
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: 1fr auto auto;
+.oc-shortcuts {
+  margin: 0;
+  color: var(--oc-color-muted);
+  font-size: 11px;
 }
 
 .oc-sidebar-mask {
@@ -621,33 +793,34 @@ function handleReconnect(): void {
 .oc-offline {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
-  color: #dc2626;
-  background: color-mix(in srgb, #dc2626 10%, transparent);
-  border-top: 1px solid color-mix(in srgb, #dc2626 30%, transparent);
-  padding: 8px;
+  color: #fca5a5;
+  background: color-mix(in srgb, #7f1d1d 22%, transparent);
+  border-top: 1px solid color-mix(in srgb, #ef4444 36%, transparent);
+  padding: 9px 10px;
 }
 
 .oc-offline button {
   border: 0;
-  background: #dc2626;
+  background: #ef4444;
   color: white;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 5px 9px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .oc-connection {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--oc-color-muted);
-  border: 1px solid var(--oc-color-border);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 90%, transparent);
   border-radius: 999px;
-  height: 30px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 10px;
+  padding: 0 11px;
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 74%, transparent);
 }
 
 .oc-connection .dot {
@@ -655,19 +828,20 @@ function handleReconnect(): void {
   height: 8px;
   border-radius: 50%;
   background: currentColor;
+  animation: oc-pulse 1.6s ease-in-out infinite;
 }
 
 .oc-connection.connected {
-  color: #0f9b5a;
+  color: #22c55e;
 }
 
 .oc-connection.reconnecting {
-  color: #d97706;
+  color: #f59e0b;
 }
 
 .oc-connection.error,
 .oc-connection.disconnected {
-  color: #dc2626;
+  color: #f87171;
 }
 
 .oc-preview {
@@ -699,6 +873,22 @@ function handleReconnect(): void {
   transform: translateY(6px);
 }
 
+@keyframes oc-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1180px) {
+  .oc-shortcuts {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
   .oc-chat-shell {
     min-height: 100dvh;
@@ -707,6 +897,16 @@ function handleReconnect(): void {
 
   .oc-chat-body {
     grid-template-columns: 1fr;
+  }
+
+  .oc-left-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    max-width: min(92vw, 380px);
+    z-index: 30;
+    box-shadow: var(--oc-shadow-md);
   }
 
   .oc-mobile-menu {
@@ -727,21 +927,22 @@ function handleReconnect(): void {
     gap: 4px;
   }
 
-  .oc-chat-header-actions button:not(.primary) {
+  .oc-pill-btn {
     display: none;
   }
 
-  .oc-agent-picker {
-    padding: 0 8px;
+  .oc-main-topbar {
+    padding: 7px 10px;
   }
 
-  .oc-agent-picker span {
+  .oc-agent-picker span,
+  .oc-shortcuts {
     display: none;
   }
 
   .oc-agent-picker select {
-    min-width: 74px;
-    max-width: 120px;
+    min-width: 94px;
+    max-width: 132px;
   }
 }
 </style>

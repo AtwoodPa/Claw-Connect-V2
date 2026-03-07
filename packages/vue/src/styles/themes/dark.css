@@ -1,20 +1,21 @@
 :root[data-openclaw-theme='dark'] {
-  --oc-color-primary: #34d399;
-  --oc-color-primary-strong: #10b981;
-  --oc-color-primary-soft: #16372f;
+  --oc-color-primary: #60a5fa;
+  --oc-color-primary-strong: #3b82f6;
+  --oc-color-primary-soft: #1f2f49;
+  --oc-color-accent: #a78bfa;
 
-  --oc-color-bg: #081411;
-  --oc-color-panel: #0c1d19;
-  --oc-color-panel-elevated: #112823;
-  --oc-color-border: #1f3b35;
+  --oc-color-bg: #020617;
+  --oc-color-panel: #0b1220;
+  --oc-color-panel-elevated: #101a2d;
+  --oc-color-border: #273244;
 
-  --oc-color-text: #d8eee8;
-  --oc-color-muted: #88a6a0;
-  --oc-color-user-bubble: linear-gradient(135deg, #0f766e, #0b5f59);
-  --oc-color-user-text: #f3fffc;
-  --oc-color-assistant-bubble: #112823;
-  --oc-color-system-text: #89aba4;
+  --oc-color-text: #e2e8f0;
+  --oc-color-muted: #93a0b8;
+  --oc-color-user-bubble: linear-gradient(135deg, #2563eb, #4338ca);
+  --oc-color-user-text: #e8eeff;
+  --oc-color-assistant-bubble: #111a2c;
+  --oc-color-system-text: #94a3b8;
 
-  --oc-shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.24);
-  --oc-shadow-md: 0 20px 48px rgba(0, 0, 0, 0.35);
+  --oc-shadow-sm: 0 12px 26px rgba(0, 0, 0, 0.28);
+  --oc-shadow-md: 0 30px 70px rgba(0, 0, 0, 0.45);
 }

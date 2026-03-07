@@ -20,7 +20,7 @@
     </div>
 
     <div class="oc-input-main">
-      <button type="button" class="oc-attach" aria-label="Attach image" @click="fileInputRef?.click()">+</button>
+      <button type="button" class="oc-attach" aria-label="Attach image" @click="fileInputRef?.click()">＋</button>
       <input ref="fileInputRef" type="file" multiple accept="image/*" hidden @change="handleFileSelect" />
 
       <div class="oc-text-wrap">
@@ -39,7 +39,7 @@
       </div>
 
       <button type="button" class="oc-send" :disabled="(!canSend && !loading) || disabled" @click="handleSend">
-        {{ loading ? t('input.stop') : 'Send' }}
+        {{ loading ? t('input.stop') : t('input.send') }}
       </button>
     </div>
 
@@ -296,12 +296,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .oc-input-wrap {
-  border-top: 1px solid var(--oc-color-border);
-  padding: 12px;
-  background: linear-gradient(180deg, var(--oc-color-panel), color-mix(in srgb, var(--oc-color-panel-elevated) 84%, transparent));
+  border-top: 1px solid color-mix(in srgb, var(--oc-color-border) 72%, transparent);
+  padding: 12px 14px 14px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--oc-color-panel) 74%, transparent), color-mix(in srgb, var(--oc-color-panel-elevated) 90%, transparent));
   display: grid;
   gap: 10px;
   position: relative;
+  backdrop-filter: blur(8px);
 }
 
 .oc-input-wrap.is-drop-active {
@@ -311,19 +312,19 @@ onBeforeUnmount(() => {
 .oc-input-main {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 8px;
+  gap: 10px;
   align-items: end;
 }
 
 .oc-attach,
 .oc-send {
-  border: 0;
-  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 80%, transparent);
+  border-radius: 13px;
   min-width: 44px;
-  height: 42px;
+  height: 44px;
   cursor: pointer;
-  background: color-mix(in srgb, var(--oc-color-primary) 16%, transparent);
-  color: var(--oc-color-primary-strong);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 84%, transparent);
+  color: var(--oc-color-text);
   font-size: 13px;
   font-weight: 600;
 }
@@ -331,16 +332,18 @@ onBeforeUnmount(() => {
 .oc-attach:hover,
 .oc-send:hover {
   transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--oc-color-primary) 44%, transparent);
 }
 
 .oc-send {
-  background: var(--oc-color-primary);
-  color: white;
-  padding: 0 12px;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--oc-color-primary), color-mix(in srgb, var(--oc-color-primary) 58%, #312e81));
+  color: #eef4ff;
+  padding: 0 14px;
 }
 
 .oc-send:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
@@ -353,23 +356,24 @@ textarea {
   resize: none;
   min-height: 46px;
   max-height: 200px;
-  border-radius: 14px;
-  border: 1px solid var(--oc-color-border);
-  padding: 10px 38px 10px 12px;
+  border-radius: 15px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 84%, transparent);
+  padding: 11px 42px 11px 13px;
   color: var(--oc-color-text);
-  background: color-mix(in srgb, var(--oc-color-panel) 82%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel) 86%, transparent);
   outline: none;
+  line-height: 1.5;
 }
 
 textarea:focus {
-  border-color: var(--oc-color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--oc-color-primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--oc-color-primary) 54%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--oc-color-primary) 14%, transparent);
 }
 
 .oc-counter {
   position: absolute;
   right: 10px;
-  bottom: 8px;
+  bottom: 9px;
   color: var(--oc-color-muted);
   font-size: 11px;
 }
@@ -387,11 +391,11 @@ textarea:focus {
 .oc-image-item {
   width: 60px;
   height: 60px;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   position: relative;
   flex: 0 0 auto;
-  border: 1px solid var(--oc-color-border);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 80%, transparent);
 }
 
 .oc-image-item img {
@@ -417,9 +421,10 @@ textarea:focus {
   list-style: none;
   margin: 0;
   padding: 6px;
-  border: 1px solid var(--oc-color-border);
-  border-radius: 12px;
-  background: var(--oc-color-panel);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 82%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--oc-color-panel) 88%, transparent);
+  backdrop-filter: blur(10px);
   display: grid;
   gap: 4px;
   max-height: 180px;
@@ -429,7 +434,7 @@ textarea:focus {
 
 .oc-command-panel li {
   padding: 8px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   display: grid;
 }
@@ -441,6 +446,7 @@ textarea:focus {
 
 .oc-command-panel small {
   color: var(--oc-color-muted);
+  margin-top: 2px;
 }
 
 .oc-input-footer {
@@ -459,6 +465,12 @@ textarea:focus {
 .oc-hint {
   color: var(--oc-color-muted);
   font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .oc-input-wrap {
+    padding: 10px;
+  }
 }
 
 @media (max-width: 640px) {

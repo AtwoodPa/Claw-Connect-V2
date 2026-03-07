@@ -1,16 +1,16 @@
-import { getActivePinia as pt, createPinia as Ye, setActivePinia as vt, defineStore as Te, storeToRefs as yt } from "pinia";
-import { computed as x, defineComponent as Se, ref as I, onMounted as Xe, onBeforeUnmount as Ze, openBlock as y, createElementBlock as w, withModifiers as de, normalizeClass as oe, Fragment as ge, renderList as me, createElementVNode as i, toDisplayString as k, createCommentVNode as O, withDirectives as Ee, vModelText as Je, unref as v, withKeys as wt, normalizeStyle as St, watch as ce, nextTick as Fe, createTextVNode as we, createVNode as ve, TransitionGroup as Ct, withCtx as et, createBlock as It, onUnmounted as bt, watchEffect as kt, vModelSelect as Mt, Transition as $t } from "vue";
-import { createI18n as At } from "vue-i18n";
-import be from "highlight.js";
+import { getActivePinia as yt, createPinia as Xe, setActivePinia as wt, defineStore as Te, storeToRefs as St } from "pinia";
+import { computed as x, defineComponent as Ce, ref as b, onMounted as Ze, onBeforeUnmount as Je, openBlock as v, createElementBlock as y, withModifiers as fe, normalizeClass as te, Fragment as ue, renderList as ce, createElementVNode as i, toDisplayString as k, createCommentVNode as q, withDirectives as Ee, vModelText as et, unref as I, withKeys as Ct, normalizeStyle as It, watch as me, nextTick as Ke, createTextVNode as Se, createVNode as ye, TransitionGroup as bt, withCtx as tt, createBlock as kt, onUnmounted as Mt, watchEffect as $t, vModelSelect as At, Transition as _t } from "vue";
+import { createI18n as Lt } from "vue-i18n";
+import ke from "highlight.js";
 import { marked as Ae } from "marked";
-const Ke = [
+const je = [
   { key: "model", label: "/model", description: "Switch model" },
   { key: "think", label: "/think", description: "Deep thinking mode" },
   { key: "new", label: "/new", description: "Create new session" },
   { key: "clear", label: "/clear", description: "Clear current session" },
   { key: "help", label: "/help", description: "Show help" }
 ];
-function _t(e) {
+function Tt(e) {
   const t = e.trim();
   if (!t.startsWith("/"))
     return null;
@@ -20,31 +20,32 @@ function _t(e) {
     args: n.join(" ").trim()
   };
 }
-function Lt(e) {
+function Et(e) {
   if (!e.trim())
-    return Ke;
+    return je;
   const t = e.toLowerCase();
-  return Ke.filter((s) => s.key.includes(t));
+  return je.filter((s) => s.key.includes(t));
 }
-const Tt = {
+const xt = {
   title: "OpenClaw Chat",
   newSession: "New session",
   agent: "Agent",
   disconnected: "Disconnected",
   reconnect: "Reconnect",
   empty: "Start chatting with OpenClaw"
-}, Et = {
+}, Dt = {
   placeholder: "Type your message...",
   thinking: "Thinking...",
+  send: "Send",
   stop: "Stop",
   queued: "Queued: {count}"
-}, xt = {
+}, Rt = {
   title: "Sessions",
   empty: "No sessions",
   delete: "Delete",
   clear: "Clear",
   new: "New"
-}, Dt = {
+}, Ut = {
   you: "You",
   assistant: "Assistant",
   system: "System",
@@ -63,35 +64,36 @@ const Tt = {
     aborted: "Stopped",
     sent: "Sent"
   }
-}, Rt = {
+}, Nt = {
   connected: "Connected",
   reconnecting: "Reconnecting",
   error: "Connection failed"
-}, Ut = {
-  chat: Tt,
-  input: Et,
-  session: xt,
-  message: Dt,
-  status: Rt
-}, Nt = {
+}, Ot = {
+  chat: xt,
+  input: Dt,
+  session: Rt,
+  message: Ut,
+  status: Nt
+}, qt = {
   title: "OpenClaw 对话",
   newSession: "新建会话",
   agent: "Agent",
   disconnected: "连接已断开",
   reconnect: "重连",
   empty: "开始和 OpenClaw 对话"
-}, Ot = {
+}, Wt = {
   placeholder: "输入消息...",
   thinking: "思考中...",
+  send: "发送",
   stop: "停止",
   queued: "等待发送: {count}"
-}, qt = {
+}, Pt = {
   title: "会话",
   empty: "暂无会话",
   delete: "删除",
   clear: "清空",
   new: "新建"
-}, Wt = {
+}, zt = {
   you: "你",
   assistant: "助手",
   system: "系统",
@@ -110,41 +112,41 @@ const Tt = {
     aborted: "已停止",
     sent: "已发送"
   }
-}, Pt = {
+}, Vt = {
   connected: "已连接",
   reconnecting: "重连中",
   error: "连接失败"
-}, Vt = {
-  chat: Nt,
-  input: Ot,
-  session: qt,
-  message: Wt,
-  status: Pt
-}, zt = {
-  en: Ut,
-  "zh-CN": Vt
+}, Bt = {
+  chat: qt,
+  input: Wt,
+  session: Pt,
+  message: zt,
+  status: Vt
+}, Ht = {
+  en: Ot,
+  "zh-CN": Bt
 };
-function Bt() {
+function Ft() {
   return typeof navigator > "u" ? "en" : navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en";
 }
-const Ht = typeof localStorage < "u" ? localStorage.getItem("openclaw:locale") : null, Ft = Ht ?? Bt(), ye = At({
+const Kt = typeof localStorage < "u" ? localStorage.getItem("openclaw:locale") : null, jt = Kt ?? Ft(), we = Lt({
   legacy: !1,
-  locale: Ft,
+  locale: jt,
   fallbackLocale: "en",
-  messages: zt
+  messages: Ht
 });
-function Ce() {
+function Ie() {
   const e = x({
-    get: () => ye.global.locale.value,
+    get: () => we.global.locale.value,
     set: (n) => {
-      ye.global.locale.value = n, typeof localStorage < "u" && localStorage.setItem("openclaw:locale", n);
+      we.global.locale.value = n, typeof localStorage < "u" && localStorage.setItem("openclaw:locale", n);
     }
   });
   function t(n) {
     e.value = n;
   }
   function s(n, a) {
-    return a ? ye.global.t(n, a) : ye.global.t(n);
+    return a ? we.global.t(n, a) : we.global.t(n);
   }
   return {
     t: s,
@@ -152,16 +154,16 @@ function Ce() {
     setLocale: t
   };
 }
-const Kt = {
+const Qt = {
   key: 0,
   class: "oc-command-panel"
-}, jt = ["onMousedown"], Qt = {
+}, Gt = ["onMousedown"], Yt = {
   key: 1,
   class: "oc-image-bar"
-}, Gt = ["src"], Yt = ["onClick"], Xt = { class: "oc-input-main" }, Zt = { class: "oc-text-wrap" }, Jt = ["placeholder", "disabled"], es = ["disabled"], ts = { class: "oc-input-footer" }, ss = {
+}, Xt = ["src"], Zt = ["onClick"], Jt = { class: "oc-input-main" }, es = { class: "oc-text-wrap" }, ts = ["placeholder", "disabled"], ss = ["disabled"], ns = { class: "oc-input-footer" }, as = {
   key: 0,
   class: "oc-queue"
-}, ns = /* @__PURE__ */ Se({
+}, os = /* @__PURE__ */ Ce({
   __name: "ChatInput",
   props: {
     modelValue: {},
@@ -174,10 +176,10 @@ const Kt = {
   },
   emits: ["update:modelValue", "send", "upload", "command", "stop"],
   setup(e, { emit: t }) {
-    const s = e, n = t, { t: a } = Ce(), g = I(null), l = I(null), T = I(null), $ = I(!1), f = I(!1), M = I(""), d = I(0), u = I(!1), h = I([]), C = x({
+    const s = e, n = t, { t: a } = Ie(), g = b(null), l = b(null), T = b(null), A = b(!1), h = b(!1), M = b(""), d = b(0), u = b(!1), p = b([]), S = x({
       get: () => s.modelValue,
       set: (c) => n("update:modelValue", c)
-    }), W = x(() => Lt(M.value)), K = x(() => C.value.trim().length > 0 && C.value.length <= s.maxLength), G = x(() => s.placeholder || a("input.placeholder")), A = x(() => Math.max(0, s.maxLength - C.value.length));
+    }), P = x(() => Et(M.value)), K = x(() => S.value.trim().length > 0 && S.value.length <= s.maxLength), G = x(() => s.placeholder || a("input.placeholder")), _ = x(() => Math.max(0, s.maxLength - S.value.length));
     function E() {
       const c = l.value;
       c && (c.style.height = "auto", c.style.height = `${Math.min(c.scrollHeight, 200)}px`);
@@ -185,154 +187,154 @@ const Kt = {
     function Y(c) {
       const m = c.match(/\/(\w*)$/);
       if (!m) {
-        f.value = !1, d.value = 0;
+        h.value = !1, d.value = 0;
         return;
       }
-      f.value = !0, M.value = m[1] ?? "", d.value = 0;
+      h.value = !0, M.value = m[1] ?? "", d.value = 0;
     }
     function B(c) {
       const m = c.target.value;
-      C.value = m, E(), Y(m);
+      S.value = m, E(), Y(m);
     }
     function j(c) {
-      f.value = !1;
-      const m = C.value;
-      C.value = m.replace(/\/\w*$/, `/${c} `), n("command", c, ""), requestAnimationFrame(() => {
-        var b;
-        (b = l.value) == null || b.focus();
+      h.value = !1;
+      const m = S.value;
+      S.value = m.replace(/\/\w*$/, `/${c} `), n("command", c, ""), requestAnimationFrame(() => {
+        var w;
+        (w = l.value) == null || w.focus();
       });
     }
-    function re(c) {
-      if (f.value && W.value.length > 0) {
+    function ie(c) {
+      if (h.value && P.value.length > 0) {
         if (c.key === "ArrowDown") {
-          c.preventDefault(), d.value = (d.value + 1) % W.value.length;
+          c.preventDefault(), d.value = (d.value + 1) % P.value.length;
           return;
         }
         if (c.key === "ArrowUp") {
-          c.preventDefault(), d.value = (d.value - 1 + W.value.length) % W.value.length;
+          c.preventDefault(), d.value = (d.value - 1 + P.value.length) % P.value.length;
           return;
         }
         if (c.key === "Enter" && !c.shiftKey) {
-          c.preventDefault(), j(W.value[d.value].key);
+          c.preventDefault(), j(P.value[d.value].key);
           return;
         }
       }
-      if (c.key === "Enter" && !c.shiftKey && !$.value) {
+      if (c.key === "Enter" && !c.shiftKey && !A.value) {
         if (c.preventDefault(), s.loading) {
           n("stop");
           return;
         }
-        N();
+        O();
       }
     }
     function ae() {
-      h.value.forEach((c) => {
+      p.value.forEach((c) => {
         URL.revokeObjectURL(c.preview);
       });
     }
-    function N() {
-      const c = C.value.trim();
+    function O() {
+      const c = S.value.trim();
       if (s.loading) {
         n("stop");
         return;
       }
       if (!c || c.length > s.maxLength)
         return;
-      const m = _t(c);
+      const m = Tt(c);
       if (m) {
-        n("command", m.command, m.args), C.value = "", E();
+        n("command", m.command, m.args), S.value = "", E();
         return;
       }
       n(
         "send",
         c,
-        h.value.map((b) => b.file)
-      ), C.value = "", ae(), h.value = [], E();
+        p.value.map((w) => w.file)
+      ), S.value = "", ae(), p.value = [], E();
     }
-    function U(c) {
+    function N(c) {
       c.slice(0, 5).forEach((m) => {
-        !m.type.startsWith("image/") || m.size > 10 * 1024 * 1024 || h.value.push({
+        !m.type.startsWith("image/") || m.size > 10 * 1024 * 1024 || p.value.push({
           file: m,
           preview: URL.createObjectURL(m)
         });
       });
     }
-    function _(c) {
+    function L(c) {
       const m = c.target.files;
-      m && (n("upload", m), U(Array.from(m)), T.value && (T.value.value = ""));
+      m && (n("upload", m), N(Array.from(m)), T.value && (T.value.value = ""));
     }
     function Q(c) {
-      const m = h.value[c];
-      m && URL.revokeObjectURL(m.preview), h.value.splice(c, 1);
+      const m = p.value[c];
+      m && URL.revokeObjectURL(m.preview), p.value.splice(c, 1);
     }
     function V() {
       u.value = !0;
     }
     function X(c) {
-      var b;
+      var w;
       const m = c.relatedTarget;
-      (b = g.value) != null && b.contains(m) || (u.value = !1);
+      (w = g.value) != null && w.contains(m) || (u.value = !1);
     }
     function R(c) {
-      var b;
+      var w;
       u.value = !1;
-      const m = Array.from(((b = c.dataTransfer) == null ? void 0 : b.files) ?? []);
-      m.length !== 0 && U(m);
+      const m = Array.from(((w = c.dataTransfer) == null ? void 0 : w.files) ?? []);
+      m.length !== 0 && N(m);
     }
-    function te(c) {
-      var b;
-      const m = Array.from(((b = c.clipboardData) == null ? void 0 : b.files) ?? []);
-      m.length !== 0 && U(m);
+    function se(c) {
+      var w;
+      const m = Array.from(((w = c.clipboardData) == null ? void 0 : w.files) ?? []);
+      m.length !== 0 && N(m);
     }
-    return Xe(() => {
+    return Ze(() => {
       var c;
-      (c = l.value) == null || c.addEventListener("paste", te);
-    }), Ze(() => {
+      (c = l.value) == null || c.addEventListener("paste", se);
+    }), Je(() => {
       var c;
-      (c = l.value) == null || c.removeEventListener("paste", te), ae();
-    }), (c, m) => (y(), w("div", {
+      (c = l.value) == null || c.removeEventListener("paste", se), ae();
+    }), (c, m) => (v(), y("div", {
       ref_key: "rootRef",
       ref: g,
-      class: oe(["oc-input-wrap", { "is-drop-active": u.value }]),
-      onDragover: de(V, ["prevent"]),
+      class: te(["oc-input-wrap", { "is-drop-active": u.value }]),
+      onDragover: fe(V, ["prevent"]),
       onDragleave: X,
-      onDrop: de(R, ["prevent"])
+      onDrop: fe(R, ["prevent"])
     }, [
-      f.value && W.value.length ? (y(), w("ul", Kt, [
-        (y(!0), w(ge, null, me(W.value, (b, J) => (y(), w("li", {
-          key: b.key,
-          class: oe({ active: J === d.value }),
-          onMousedown: de((fe) => j(b.key), ["prevent"])
+      h.value && P.value.length ? (v(), y("ul", Qt, [
+        (v(!0), y(ue, null, ce(P.value, (w, J) => (v(), y("li", {
+          key: w.key,
+          class: te({ active: J === d.value }),
+          onMousedown: fe((de) => j(w.key), ["prevent"])
         }, [
-          i("strong", null, k(b.label), 1),
-          i("small", null, k(b.description), 1)
-        ], 42, jt))), 128))
-      ])) : O("", !0),
-      h.value.length ? (y(), w("div", Qt, [
-        (y(!0), w(ge, null, me(h.value, (b, J) => (y(), w("div", {
+          i("strong", null, k(w.label), 1),
+          i("small", null, k(w.description), 1)
+        ], 42, Gt))), 128))
+      ])) : q("", !0),
+      p.value.length ? (v(), y("div", Yt, [
+        (v(!0), y(ue, null, ce(p.value, (w, J) => (v(), y("div", {
           key: J,
           class: "oc-image-item"
         }, [
           i("img", {
-            src: b.preview,
+            src: w.preview,
             alt: "preview"
-          }, null, 8, Gt),
+          }, null, 8, Xt),
           i("button", {
             type: "button",
-            onClick: (fe) => Q(J)
-          }, "×", 8, Yt)
+            onClick: (de) => Q(J)
+          }, "×", 8, Zt)
         ]))), 128))
-      ])) : O("", !0),
-      i("div", Xt, [
+      ])) : q("", !0),
+      i("div", Jt, [
         i("button", {
           type: "button",
           class: "oc-attach",
           "aria-label": "Attach image",
-          onClick: m[0] || (m[0] = (b) => {
+          onClick: m[0] || (m[0] = (w) => {
             var J;
             return (J = T.value) == null ? void 0 : J.click();
           })
-        }, "+"),
+        }, "＋"),
         i("input", {
           ref_key: "fileInputRef",
           ref: T,
@@ -340,54 +342,54 @@ const Kt = {
           multiple: "",
           accept: "image/*",
           hidden: "",
-          onChange: _
+          onChange: L
         }, null, 544),
-        i("div", Zt, [
+        i("div", es, [
           Ee(i("textarea", {
             ref_key: "textareaRef",
             ref: l,
-            "onUpdate:modelValue": m[1] || (m[1] = (b) => C.value = b),
+            "onUpdate:modelValue": m[1] || (m[1] = (w) => S.value = w),
             placeholder: G.value,
             disabled: e.disabled,
             rows: "1",
             onInput: B,
-            onKeydown: re,
-            onCompositionstart: m[2] || (m[2] = (b) => $.value = !0),
-            onCompositionend: m[3] || (m[3] = (b) => $.value = !1)
-          }, null, 40, Jt), [
-            [Je, C.value]
+            onKeydown: ie,
+            onCompositionstart: m[2] || (m[2] = (w) => A.value = !0),
+            onCompositionend: m[3] || (m[3] = (w) => A.value = !1)
+          }, null, 40, ts), [
+            [et, S.value]
           ]),
           i("div", {
-            class: oe(["oc-counter", { warn: A.value < 120 }])
-          }, k(A.value), 3)
+            class: te(["oc-counter", { warn: _.value < 120 }])
+          }, k(_.value), 3)
         ]),
         i("button", {
           type: "button",
           class: "oc-send",
           disabled: !K.value && !e.loading || e.disabled,
-          onClick: N
-        }, k(e.loading ? v(a)("input.stop") : "Send"), 9, es)
+          onClick: O
+        }, k(e.loading ? I(a)("input.stop") : I(a)("input.send")), 9, ss)
       ]),
-      i("div", ts, [
-        e.queuedCount > 0 ? (y(), w("span", ss, k(v(a)("input.queued", { count: e.queuedCount })), 1)) : O("", !0),
+      i("div", ns, [
+        e.queuedCount > 0 ? (v(), y("span", as, k(I(a)("input.queued", { count: e.queuedCount })), 1)) : q("", !0),
         m[4] || (m[4] = i("span", { class: "oc-hint" }, "Enter to send · Shift+Enter newline · / for commands", -1))
       ])
     ], 34));
   }
-}), Ie = (e, t) => {
+}), be = (e, t) => {
   const s = e.__vccOpts || e;
   for (const [n, a] of t)
     s[n] = a;
   return s;
-}, tt = /* @__PURE__ */ Ie(ns, [["__scopeId", "data-v-7e81463e"]]);
-function st(e, t = "zh-CN") {
+}, st = /* @__PURE__ */ be(os, [["__scopeId", "data-v-230825ba"]]);
+function nt(e, t = "zh-CN") {
   const s = new Date(e);
   return new Intl.DateTimeFormat(t, {
     hour: "2-digit",
     minute: "2-digit"
   }).format(s);
 }
-function as(e, t = "zh-CN") {
+function is(e, t = "zh-CN") {
   const n = Date.now() - e;
   if (n < 6e4)
     return t.startsWith("zh") ? "刚刚" : "now";
@@ -395,44 +397,44 @@ function as(e, t = "zh-CN") {
     const a = Math.floor(n / 6e4);
     return t.startsWith("zh") ? `${a}分钟前` : `${a}m ago`;
   }
-  return st(e, t);
+  return nt(e, t);
 }
 Ae.setOptions({
   gfm: !0,
   breaks: !0
 });
-function os(e, t) {
-  return t ? be.getLanguage(t) ? be.highlight(e, { language: t }).value : be.highlightAuto(e).value : be.highlightAuto(e).value;
+function rs(e, t) {
+  return t ? ke.getLanguage(t) ? ke.highlight(e, { language: t }).value : ke.highlightAuto(e).value : ke.highlightAuto(e).value;
 }
-function rs(e) {
+function ls(e) {
   return e.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "").replace(/<(iframe|object|embed|style)[\s\S]*?>[\s\S]*?<\/\1>/gi, "").replace(/\son\w+=['"][^'"]*['"]/gi, "").replace(/javascript:/gi, "");
 }
-function je(e) {
+function Qe(e) {
   const t = e.match(/```[\s\S]*?```/g);
   return t ? t.map((s) => s.replace(/^```\w*\n?/, "").replace(/```$/, "").trim()) : [];
 }
-function is(e, t = {}) {
+function us(e, t = {}) {
   const s = new Ae.Renderer(), n = t.highlight ?? !0;
   s.code = (g, l) => {
-    const T = (l == null ? void 0 : l.split(/\s+/)[0]) ?? "", $ = n ? os(g, T) : g;
-    return `<pre class="oc-code-block"><code class="hljs language-${T}">${$}</code></pre>`;
+    const T = (l == null ? void 0 : l.split(/\s+/)[0]) ?? "", A = n ? rs(g, T) : g;
+    return `<pre class="oc-code-block"><code class="hljs language-${T}">${A}</code></pre>`;
   }, s.link = (g, l, T) => {
-    const $ = g ?? "#", f = l ? ` title="${l}"` : "";
-    return `<a href="${$}" target="_blank" rel="noopener noreferrer"${f}>${T}</a>`;
+    const A = g ?? "#", h = l ? ` title="${l}"` : "";
+    return `<a href="${A}" target="_blank" rel="noopener noreferrer"${h}>${T}</a>`;
   };
   const a = Ae.parse(e, { renderer: s });
-  return rs(a);
+  return ls(a);
 }
-const ls = {
+const cs = {
   key: 0,
   class: "oc-message-avatar"
-}, us = { class: "oc-message-content" }, cs = { class: "oc-message-header" }, ds = { class: "oc-message-body" }, gs = {
+}, ds = { class: "oc-message-content" }, gs = { class: "oc-message-header" }, ms = { class: "oc-message-body" }, fs = {
   key: 0,
   class: "oc-message-images"
-}, ms = ["src", "onClick"], fs = ["innerHTML"], hs = {
+}, hs = ["src", "onClick"], ps = ["innerHTML"], vs = {
   key: 2,
   class: "oc-cursor"
-}, ps = { class: "oc-message-actions" }, vs = /* @__PURE__ */ Se({
+}, ys = { class: "oc-message-actions" }, ws = /* @__PURE__ */ Ce({
   __name: "MessageItem",
   props: {
     message: {},
@@ -440,9 +442,9 @@ const ls = {
   },
   emits: ["copy", "preview-image", "regenerate", "quote", "delete"],
   setup(e, { emit: t }) {
-    const s = e, n = t, { t: a, locale: g } = Ce(), l = I(!1), T = I(0), $ = I(0), f = I(!1);
+    const s = e, n = t, { t: a, locale: g } = Ie(), l = b(!1), T = b(0), A = b(0), h = b(!1);
     let M = null;
-    const d = x(() => is(s.message.content, { highlight: !0 })), u = x(() => je(s.message.content).length > 0), h = x(() => f.value ? a("message.copied") : a("message.copy")), C = x(() => s.message.role === "user" && !!s.message.status), W = x(() => `is-${s.message.status ?? "sent"}`), K = x(() => {
+    const d = x(() => us(s.message.content, { highlight: !0 })), u = x(() => Qe(s.message.content).length > 0), p = x(() => h.value ? a("message.copied") : a("message.copy")), S = x(() => s.message.role === "user" && !!s.message.status), P = x(() => `is-${s.message.status ?? "sent"}`), K = x(() => {
       switch (s.message.status) {
         case "pending":
           return a("message.status.pending");
@@ -461,127 +463,127 @@ const ls = {
         default:
           return a("message.status.sent");
       }
-    }), G = x(() => s.message.role === "user" ? a("message.you") : s.message.role === "assistant" ? a("message.assistant") : a("message.system")), A = x(() => s.message.role === "assistant" ? "AI" : s.message.role === "user" ? "U" : "S"), E = x(() => ({
+    }), G = x(() => s.message.role === "user" ? a("message.you") : s.message.role === "assistant" ? a("message.assistant") : a("message.system")), _ = x(() => s.message.role === "assistant" ? "AI" : s.message.role === "user" ? "U" : "S"), E = x(() => ({
       left: `${T.value}px`,
-      top: `${$.value}px`
+      top: `${A.value}px`
     }));
-    function Y(U, _) {
+    function Y(N, L) {
       const X = Math.max(10, window.innerWidth - 160 - 10), R = Math.max(10, window.innerHeight - 180 - 10);
-      T.value = Math.min(Math.max(10, U), X), $.value = Math.min(Math.max(10, _), R);
+      T.value = Math.min(Math.max(10, N), X), A.value = Math.min(Math.max(10, L), R);
     }
-    function B(U) {
-      Y(U.clientX, U.clientY), l.value = !0;
+    function B(N) {
+      Y(N.clientX, N.clientY), l.value = !0;
     }
-    function j(U) {
+    function j(N) {
       M = window.setTimeout(() => {
-        const _ = U.touches[0];
-        Y(_.clientX, _.clientY), l.value = !0;
+        const L = N.touches[0];
+        Y(L.clientX, L.clientY), l.value = !0;
       }, 500);
     }
-    function re() {
+    function ie() {
       M && (window.clearTimeout(M), M = null);
     }
     async function ae() {
-      await navigator.clipboard.writeText(s.message.content), f.value = !0, n("copy", s.message.content), window.setTimeout(() => {
-        f.value = !1;
+      await navigator.clipboard.writeText(s.message.content), h.value = !0, n("copy", s.message.content), window.setTimeout(() => {
+        h.value = !1;
       }, 2e3);
     }
-    async function N(U) {
-      if (U === "copy" && await ae(), U === "copy-code") {
-        const _ = je(s.message.content);
-        await navigator.clipboard.writeText(_.join(`
+    async function O(N) {
+      if (N === "copy" && await ae(), N === "copy-code") {
+        const L = Qe(s.message.content);
+        await navigator.clipboard.writeText(L.join(`
 
 `));
       }
-      U === "quote" && n("quote", s.message), U === "delete" && n("delete", s.message.id), l.value = !1;
+      N === "quote" && n("quote", s.message), N === "delete" && n("delete", s.message.id), l.value = !1;
     }
-    return (U, _) => {
+    return (N, L) => {
       var Q;
-      return y(), w("article", {
-        class: oe(["oc-message-item", [e.message.role, { streaming: e.isStreaming }]]),
-        onContextmenu: de(B, ["prevent"]),
+      return v(), y("article", {
+        class: te(["oc-message-item", [e.message.role, { streaming: e.isStreaming }]]),
+        onContextmenu: fe(B, ["prevent"]),
         onTouchstart: j,
-        onTouchend: re
+        onTouchend: ie
       }, [
-        e.message.role !== "system" ? (y(), w("div", ls, k(A.value), 1)) : O("", !0),
-        i("div", us, [
-          i("header", cs, [
+        e.message.role !== "system" ? (v(), y("div", cs, k(_.value), 1)) : q("", !0),
+        i("div", ds, [
+          i("header", gs, [
             i("span", null, k(G.value), 1),
-            i("time", null, k(v(st)(e.message.timestamp, v(g))), 1),
-            C.value ? (y(), w("span", {
+            i("time", null, k(I(nt)(e.message.timestamp, I(g))), 1),
+            S.value ? (v(), y("span", {
               key: 0,
-              class: oe(["oc-message-status", W.value])
-            }, k(K.value), 3)) : O("", !0)
+              class: te(["oc-message-status", P.value])
+            }, k(K.value), 3)) : q("", !0)
           ]),
-          i("div", ds, [
-            (Q = e.message.images) != null && Q.length ? (y(), w("div", gs, [
-              (y(!0), w(ge, null, me(e.message.images, (V, X) => (y(), w("img", {
+          i("div", ms, [
+            (Q = e.message.images) != null && Q.length ? (v(), y("div", fs, [
+              (v(!0), y(ue, null, ce(e.message.images, (V, X) => (v(), y("img", {
                 key: X,
                 src: V.thumbnail || V.url,
                 class: "oc-message-image",
-                onClick: (R) => U.$emit("preview-image", V.url)
-              }, null, 8, ms))), 128))
-            ])) : O("", !0),
-            e.message.content ? (y(), w("div", {
+                onClick: (R) => N.$emit("preview-image", V.url)
+              }, null, 8, hs))), 128))
+            ])) : q("", !0),
+            e.message.content ? (v(), y("div", {
               key: 1,
               class: "oc-message-text",
               innerHTML: d.value
-            }, null, 8, fs)) : O("", !0),
-            e.isStreaming ? (y(), w("span", hs, "▋")) : O("", !0)
+            }, null, 8, ps)) : q("", !0),
+            e.isStreaming ? (v(), y("span", vs, "▋")) : q("", !0)
           ]),
-          i("footer", ps, [
+          i("footer", ys, [
             i("button", {
               type: "button",
               onClick: ae
-            }, k(h.value), 1),
-            e.message.role === "assistant" ? (y(), w("button", {
+            }, k(p.value), 1),
+            e.message.role === "assistant" ? (v(), y("button", {
               key: 0,
               type: "button",
-              onClick: _[0] || (_[0] = (V) => U.$emit("regenerate"))
-            }, k(v(a)("message.regenerate")), 1)) : O("", !0)
+              onClick: L[0] || (L[0] = (V) => N.$emit("regenerate"))
+            }, k(I(a)("message.regenerate")), 1)) : q("", !0)
           ])
         ]),
-        l.value ? (y(), w("div", {
+        l.value ? (v(), y("div", {
           key: 1,
           class: "oc-context-mask",
-          onClick: _[1] || (_[1] = (V) => l.value = !1),
-          onKeyup: _[2] || (_[2] = wt((V) => l.value = !1, ["esc"]))
-        }, null, 32)) : O("", !0),
-        l.value ? (y(), w("menu", {
+          onClick: L[1] || (L[1] = (V) => l.value = !1),
+          onKeyup: L[2] || (L[2] = Ct((V) => l.value = !1, ["esc"]))
+        }, null, 32)) : q("", !0),
+        l.value ? (v(), y("menu", {
           key: 2,
           class: "oc-context-menu",
-          style: St(E.value)
+          style: It(E.value)
         }, [
           i("button", {
             type: "button",
-            onClick: _[3] || (_[3] = (V) => N("copy"))
-          }, k(v(a)("message.copy")), 1),
-          u.value ? (y(), w("button", {
+            onClick: L[3] || (L[3] = (V) => O("copy"))
+          }, k(I(a)("message.copy")), 1),
+          u.value ? (v(), y("button", {
             key: 0,
             type: "button",
-            onClick: _[4] || (_[4] = (V) => N("copy-code"))
-          }, "Copy Code")) : O("", !0),
+            onClick: L[4] || (L[4] = (V) => O("copy-code"))
+          }, "Copy Code")) : q("", !0),
           i("button", {
             type: "button",
-            onClick: _[5] || (_[5] = (V) => N("quote"))
-          }, k(v(a)("message.quote")), 1),
-          e.message.role === "user" ? (y(), w("button", {
+            onClick: L[5] || (L[5] = (V) => O("quote"))
+          }, k(I(a)("message.quote")), 1),
+          e.message.role === "user" ? (v(), y("button", {
             key: 1,
             type: "button",
             class: "danger",
-            onClick: _[6] || (_[6] = (V) => N("delete"))
-          }, k(v(a)("message.delete")), 1)) : O("", !0)
-        ], 4)) : O("", !0)
+            onClick: L[6] || (L[6] = (V) => O("delete"))
+          }, k(I(a)("message.delete")), 1)) : q("", !0)
+        ], 4)) : q("", !0)
       ], 34);
     };
   }
-}), nt = /* @__PURE__ */ Ie(vs, [["__scopeId", "data-v-77147782"]]), ys = {
+}), at = /* @__PURE__ */ be(ws, [["__scopeId", "data-v-2a663581"]]), Ss = {
   key: 0,
   class: "oc-empty-state"
-}, ws = {
+}, Cs = {
   key: 1,
   class: "oc-loading"
-}, Ss = /* @__PURE__ */ Se({
+}, Is = /* @__PURE__ */ Ce({
   __name: "MessageList",
   props: {
     messages: {},
@@ -591,37 +593,37 @@ const ls = {
   },
   emits: ["scroll-top", "copy", "preview-image", "regenerate", "quote", "delete"],
   setup(e, { expose: t, emit: s }) {
-    const n = e, a = s, { t: g } = Ce(), l = I(null), T = I(!1);
-    function $() {
+    const n = e, a = s, { t: g } = Ie(), l = b(null), T = b(!1);
+    function A() {
       const d = l.value;
       return d ? d.scrollHeight - d.scrollTop - d.clientHeight < 120 : !0;
     }
-    function f(d = "auto") {
+    function h(d = "auto") {
       const u = l.value;
       u && (u.scrollTo({ top: u.scrollHeight, behavior: d }), T.value = !1);
     }
     function M() {
       const d = l.value;
-      d && (d.scrollTop <= 0 && a("scroll-top"), T.value = !$());
+      d && (d.scrollTop <= 0 && a("scroll-top"), T.value = !A());
     }
-    return ce(
+    return me(
       () => n.messages.length,
       async () => {
-        const d = $();
-        await Fe(), d && f();
+        const d = A();
+        await Ke(), d && h();
       }
-    ), ce(
+    ), me(
       () => {
         var d;
         return (d = n.messages.at(-1)) == null ? void 0 : d.content;
       },
       async () => {
-        const d = $();
-        await Fe(), n.streaming && d && f();
+        const d = A();
+        await Ke(), n.streaming && d && h();
       }
     ), t({
-      scrollToBottom: f
-    }), (d, u) => (y(), w("section", {
+      scrollToBottom: h
+    }), (d, u) => (v(), y("section", {
       ref_key: "containerRef",
       ref: l,
       class: "oc-message-list",
@@ -629,59 +631,63 @@ const ls = {
       "aria-live": "polite",
       onScroll: M
     }, [
-      e.messages.length === 0 ? (y(), w("div", ys, [
-        i("h3", null, k(v(g)("chat.empty")), 1),
+      e.messages.length === 0 ? (v(), y("div", Ss, [
+        i("h3", null, k(I(g)("chat.empty")), 1),
         u[5] || (u[5] = i("p", null, [
-          we("Try: "),
+          Se("Try: "),
           i("code", null, "/help"),
-          we(" · "),
+          Se(" · "),
           i("code", null, "/new"),
-          we(" · "),
+          Se(" · "),
           i("code", null, "/think")
         ], -1))
-      ])) : O("", !0),
-      ve(Ct, {
+      ])) : q("", !0),
+      ye(bt, {
         name: "oc-message",
         tag: "div",
         class: "oc-message-stack",
         appear: ""
       }, {
-        default: et(() => [
-          (y(!0), w(ge, null, me(e.messages, (h) => (y(), It(nt, {
-            key: h.id,
-            message: h,
-            "is-streaming": e.streaming && h.id === e.streamingMessageId,
-            onCopy: u[0] || (u[0] = (C) => d.$emit("copy", C)),
-            onPreviewImage: u[1] || (u[1] = (C) => d.$emit("preview-image", C)),
-            onRegenerate: (C) => d.$emit("regenerate", h.id),
-            onQuote: u[2] || (u[2] = (C) => d.$emit("quote", C)),
-            onDelete: u[3] || (u[3] = (C) => d.$emit("delete", C))
+        default: tt(() => [
+          (v(!0), y(ue, null, ce(e.messages, (p) => (v(), kt(at, {
+            key: p.id,
+            message: p,
+            "is-streaming": e.streaming && p.id === e.streamingMessageId,
+            onCopy: u[0] || (u[0] = (S) => d.$emit("copy", S)),
+            onPreviewImage: u[1] || (u[1] = (S) => d.$emit("preview-image", S)),
+            onRegenerate: (S) => d.$emit("regenerate", p.id),
+            onQuote: u[2] || (u[2] = (S) => d.$emit("quote", S)),
+            onDelete: u[3] || (u[3] = (S) => d.$emit("delete", S))
           }, null, 8, ["message", "is-streaming", "onRegenerate"]))), 128))
         ]),
         _: 1
       }),
-      e.loading && !e.streaming ? (y(), w("div", ws, "...")) : O("", !0),
-      T.value ? (y(), w("button", {
+      e.loading && !e.streaming ? (v(), y("div", Cs, [...u[6] || (u[6] = [
+        i("span", null, null, -1),
+        i("span", null, null, -1),
+        i("span", null, null, -1)
+      ])])) : q("", !0),
+      T.value ? (v(), y("button", {
         key: 2,
         type: "button",
         class: "oc-scroll-btn",
-        onClick: u[4] || (u[4] = (h) => f("smooth"))
-      }, " ↓ New ")) : O("", !0)
+        onClick: u[4] || (u[4] = (p) => h("smooth"))
+      }, " ↓ New ")) : q("", !0)
     ], 544));
   }
-}), at = /* @__PURE__ */ Ie(Ss, [["__scopeId", "data-v-0c653ea3"]]), Cs = { class: "oc-session-header" }, Is = { class: "oc-session-header-actions" }, bs = { class: "oc-session-search-wrap" }, ks = {
+}), ot = /* @__PURE__ */ be(Is, [["__scopeId", "data-v-ea959da0"]]), bs = { class: "oc-session-header" }, ks = { class: "oc-session-heading" }, Ms = { class: "oc-session-header-actions" }, $s = { class: "oc-session-search-wrap" }, As = {
   key: 0,
   class: "oc-session-empty"
-}, Ms = {
+}, _s = {
   key: 1,
   class: "oc-session-items"
-}, $s = ["onClick"], As = { class: "oc-session-main" }, _s = { class: "oc-session-title" }, Ls = {
+}, Ls = ["onClick"], Ts = { class: "oc-session-main" }, Es = { class: "oc-session-title" }, xs = {
   key: 0,
   class: "oc-pin"
-}, Ts = { class: "oc-session-meta" }, Es = { class: "oc-session-agent" }, xs = { class: "oc-session-time" }, Ds = { class: "oc-session-sub" }, Rs = { class: "oc-session-preview" }, Us = {
+}, Ds = { class: "oc-session-meta" }, Rs = { class: "oc-session-agent" }, Us = { class: "oc-session-time" }, Ns = { class: "oc-session-sub" }, Os = { class: "oc-session-preview" }, qs = {
   key: 0,
   class: "oc-session-count"
-}, Ns = { class: "oc-session-actions" }, Os = ["onClick"], qs = ["onClick"], Ws = /* @__PURE__ */ Se({
+}, Ws = { class: "oc-session-actions" }, Ps = ["onClick"], zs = ["onClick"], Vs = /* @__PURE__ */ Ce({
   __name: "SessionList",
   props: {
     sessions: {},
@@ -691,83 +697,85 @@ const ls = {
   },
   emits: ["update:visible", "select", "delete", "reset", "new"],
   setup(e, { emit: t }) {
-    const s = e, n = t, { t: a, locale: g } = Ce(), l = I(""), T = x(() => {
-      const M = l.value.trim().toLowerCase(), d = [...s.sessions].sort((u, h) => !!u.pinned != !!h.pinned ? u.pinned ? -1 : 1 : h.updatedAt - u.updatedAt);
+    const s = e, n = t, { t: a, locale: g } = Ie(), l = b(""), T = x(() => {
+      const M = l.value.trim().toLowerCase(), d = [...s.sessions].sort((u, p) => !!u.pinned != !!p.pinned ? u.pinned ? -1 : 1 : p.updatedAt - u.updatedAt);
       return M ? d.filter((u) => u.title.toLowerCase().includes(M) || u.lastMessage.toLowerCase().includes(M)) : d;
     });
-    function $(M) {
+    function A(M) {
       n("select", M), window.innerWidth < 900 && n("update:visible", !1);
     }
-    function f(M) {
+    function h(M) {
       return s.agentLabels[M] ? s.agentLabels[M] : M;
     }
-    return (M, d) => (y(), w("aside", {
-      class: oe(["oc-session-list", { hidden: !e.visible }])
+    return (M, d) => (v(), y("aside", {
+      class: te(["oc-session-list", { hidden: !e.visible }])
     }, [
-      i("header", Cs, [
-        i("div", null, [
-          i("strong", null, k(v(a)("session.title")), 1),
-          d[2] || (d[2] = i("p", null, "Context library", -1))
+      i("header", bs, [
+        i("div", ks, [
+          i("strong", null, k(I(a)("session.title")), 1),
+          i("p", null, k(T.value.length) + " sessions", 1)
         ]),
-        i("div", Is, [
+        i("div", Ms, [
           i("button", {
             type: "button",
             class: "oc-session-btn",
             onClick: d[0] || (d[0] = (u) => n("new"))
-          }, k(v(a)("session.new")), 1)
+          }, "＋")
         ])
       ]),
-      i("div", bs, [
+      i("div", $s, [
         Ee(i("input", {
           "onUpdate:modelValue": d[1] || (d[1] = (u) => l.value = u),
           type: "text",
           placeholder: "Search sessions...",
           class: "oc-session-search"
         }, null, 512), [
-          [Je, l.value]
+          [et, l.value]
         ])
       ]),
-      T.value.length === 0 ? (y(), w("div", ks, k(v(a)("session.empty")), 1)) : (y(), w("ul", Ms, [
-        (y(!0), w(ge, null, me(T.value, (u) => (y(), w("li", {
+      T.value.length === 0 ? (v(), y("div", As, k(I(a)("session.empty")), 1)) : (v(), y("ul", _s, [
+        (v(!0), y(ue, null, ce(T.value, (u) => (v(), y("li", {
           key: u.id,
-          class: oe(["oc-session-item", { active: u.id === e.currentId }]),
-          onClick: (h) => $(u.id)
+          class: te(["oc-session-item", { active: u.id === e.currentId }]),
+          onClick: (p) => A(u.id)
         }, [
-          i("div", As, [
-            i("span", _s, [
-              u.pinned ? (y(), w("span", Ls, "📌")) : O("", !0),
-              we(" " + k(u.title), 1)
+          i("div", Ts, [
+            i("span", Es, [
+              u.pinned ? (v(), y("span", xs, "📌")) : q("", !0),
+              Se(" " + k(u.title), 1)
             ]),
-            i("div", Ts, [
-              i("span", Es, k(f(u.agentId)), 1),
-              i("span", xs, k(v(as)(u.updatedAt, v(g))), 1)
+            i("div", Ds, [
+              i("span", Rs, k(h(u.agentId)), 1),
+              i("span", Us, k(I(is)(u.updatedAt, I(g))), 1)
             ])
           ]),
-          i("div", Ds, [
-            i("span", Rs, k(u.lastMessage || "..."), 1),
-            u.messageCount > 0 ? (y(), w("span", Us, k(u.messageCount > 99 ? "99+" : u.messageCount), 1)) : O("", !0)
-          ]),
           i("div", Ns, [
+            i("span", Os, k(u.lastMessage || "..."), 1),
+            u.messageCount > 0 ? (v(), y("span", qs, k(u.messageCount > 99 ? "99+" : u.messageCount), 1)) : q("", !0)
+          ]),
+          i("div", Ws, [
             i("button", {
               type: "button",
-              onClick: de((h) => n("reset", u.id), ["stop"])
-            }, k(v(a)("session.clear")), 9, Os),
+              title: "Clear",
+              onClick: fe((p) => n("reset", u.id), ["stop"])
+            }, "↺", 8, Ps),
             i("button", {
               type: "button",
-              onClick: de((h) => n("delete", u.id), ["stop"])
-            }, k(v(a)("session.delete")), 9, qs)
+              title: "Delete",
+              onClick: fe((p) => n("delete", u.id), ["stop"])
+            }, "✕", 8, zs)
           ])
-        ], 10, $s))), 128))
+        ], 10, Ls))), 128))
       ]))
     ], 2));
   }
-}), ot = /* @__PURE__ */ Ie(Ws, [["__scopeId", "data-v-9b3bd263"]]);
-let ke = null;
-function Ps() {
-  const e = pt();
-  return e || (ke || (ke = Ye()), vt(ke), ke);
+}), it = /* @__PURE__ */ be(Vs, [["__scopeId", "data-v-5472d298"]]);
+let Me = null;
+function Bs() {
+  const e = yt();
+  return e || (Me || (Me = Xe()), wt(Me), Me);
 }
-function Qe(e) {
+function Ge(e) {
   const t = /* @__PURE__ */ new Map();
   for (const s of e) {
     const n = t.get(s.id);
@@ -817,10 +825,10 @@ const rt = Te("chat", {
       this.ensureSession(e), this.messages[e].push(t);
     },
     setSessionMessages(e, t) {
-      this.ensureSession(e), this.messages[e] = Qe(t);
+      this.ensureSession(e), this.messages[e] = Ge(t);
     },
     mergeMessages(e, t) {
-      this.ensureSession(e), this.messages[e] = Qe([...this.messages[e] ?? [], ...t]);
+      this.ensureSession(e), this.messages[e] = Ge([...this.messages[e] ?? [], ...t]);
     },
     updateMessage(e, t, s) {
       const n = (this.messages[e] ?? []).find((a) => a.id === t);
@@ -855,7 +863,7 @@ const rt = Te("chat", {
     }
   }
 });
-function Ge(e, t, s = "main") {
+function Ye(e, t, s = "main") {
   var a, g;
   return {
     id: t ?? ((g = (a = globalThis.crypto) == null ? void 0 : a.randomUUID) == null ? void 0 : g.call(a)) ?? `${Date.now()}`,
@@ -867,9 +875,9 @@ function Ge(e, t, s = "main") {
     pinned: !1
   };
 }
-const it = Te("session", {
+const lt = Te("session", {
   state: () => {
-    const e = Ge("新会话", "default", "main");
+    const e = Ye("新会话", "default", "main");
     return {
       sessions: [e],
       currentId: e.id,
@@ -893,7 +901,7 @@ const it = Te("session", {
   },
   actions: {
     createSession(e = "新会话", t, s = "main") {
-      const n = Ge(e, t, s);
+      const n = Ye(e, t, s);
       return this.sessions.unshift(n), this.currentId = n.id, n;
     },
     selectSession(e) {
@@ -938,7 +946,7 @@ const it = Te("session", {
       this.sessions = [...this.sortedSessions];
     }
   }
-}), Vs = Te("connection", {
+}), Hs = Te("connection", {
   state: () => ({
     status: "disconnected",
     reconnectCount: 0,
@@ -960,15 +968,15 @@ const it = Te("session", {
     }
   }
 });
-function zs(e) {
-  const t = I(null), s = I("disconnected"), n = I(0), a = I(null);
+function Fs(e) {
+  const t = b(null), s = b("disconnected"), n = b(0), a = b(null);
   let g = null, l = null, T = !1;
-  const $ = e.reconnectMax ?? 5, f = e.reconnectDelay ?? 3e3;
+  const A = e.reconnectMax ?? 5, h = e.reconnectDelay ?? 3e3;
   function M() {
     g && (window.clearTimeout(g), g = null), l && (window.clearInterval(l), l = null);
   }
-  function d(A) {
-    const E = A.trim();
+  function d(_) {
+    const E = _.trim();
     if (!E)
       throw new Error("Gateway URL is empty");
     const Y = /^wss?:\/\//.test(E) || /^https?:\/\//.test(E) ? E : `http://${E}`, B = new URL(Y);
@@ -981,80 +989,80 @@ function zs(e) {
       t.value && t.value.readyState === WebSocket.OPEN && G({ type: "ping" });
     }, 3e4);
   }
-  function h() {
-    if (n.value >= $) {
+  function p() {
+    if (n.value >= A) {
       s.value = "error";
       return;
     }
     n.value += 1, s.value = "reconnecting";
-    const A = Math.min(f * n.value, 15e3);
+    const _ = Math.min(h * n.value, 15e3);
     g = window.setTimeout(() => {
-      C();
-    }, A);
+      S();
+    }, _);
   }
-  async function C() {
+  async function S() {
     T = !1, M();
     try {
-      const A = d(e.gatewayUrl);
-      t.value = new WebSocket(A);
-    } catch (A) {
-      s.value = "error", a.value = A instanceof Error ? A.message : String(A), h();
+      const _ = d(e.gatewayUrl);
+      t.value = new WebSocket(_);
+    } catch (_) {
+      s.value = "error", a.value = _ instanceof Error ? _.message : String(_), p();
       return;
     }
     t.value.onopen = () => {
-      var A;
-      s.value = "connected", n.value = 0, a.value = null, u(), (A = e.onConnect) == null || A.call(e), e.token && G({
+      var _;
+      s.value = "connected", n.value = 0, a.value = null, u(), (_ = e.onConnect) == null || _.call(e), e.token && G({
         type: "auth",
         payload: {
           token: e.token
         }
       });
-    }, t.value.onmessage = (A) => {
+    }, t.value.onmessage = (_) => {
       var E;
       try {
-        const Y = JSON.parse(A.data);
+        const Y = JSON.parse(_.data);
         (E = e.onMessage) == null || E.call(e, Y);
       } catch {
         s.value = "error", a.value = "Failed to parse websocket payload";
       }
-    }, t.value.onerror = (A) => {
+    }, t.value.onerror = (_) => {
       var E;
-      s.value = "error", (E = e.onError) == null || E.call(e, A);
-    }, t.value.onclose = (A) => {
+      s.value = "error", (E = e.onError) == null || E.call(e, _);
+    }, t.value.onclose = (_) => {
       var E;
-      if (M(), (E = e.onDisconnect) == null || E.call(e, A), T) {
+      if (M(), (E = e.onDisconnect) == null || E.call(e, _), T) {
         s.value = "disconnected";
         return;
       }
-      h();
+      p();
     };
   }
-  function W() {
+  function P() {
     T = !0, M(), t.value && (t.value.onclose = null, t.value.close(), t.value = null), s.value = "disconnected";
   }
   function K() {
-    M(), t.value && (t.value.onclose = null, t.value.close(), t.value = null), T = !1, C();
+    M(), t.value && (t.value.onclose = null, t.value.close(), t.value = null), T = !1, S();
   }
-  function G(A) {
+  function G(_) {
     if (!t.value || t.value.readyState !== WebSocket.OPEN)
       throw new Error("WebSocket is not connected");
-    t.value.send(JSON.stringify(A));
+    t.value.send(JSON.stringify(_));
   }
-  return bt(() => {
-    W();
+  return Mt(() => {
+    P();
   }), {
     ws: t,
     status: s,
     reconnectCount: n,
     lastError: a,
-    connect: C,
-    disconnect: W,
+    connect: S,
+    disconnect: P,
     reconnect: K,
     send: G
   };
 }
-function Bs() {
-  const e = I([]);
+function Ks() {
+  const e = b([]);
   function t(g) {
     e.value.push(g);
   }
@@ -1075,83 +1083,83 @@ function Bs() {
     clear: a
   };
 }
-function Hs() {
+function js() {
   var e, t;
   return ((t = (e = globalThis.crypto) == null ? void 0 : e.randomUUID) == null ? void 0 : t.call(e)) ?? `${Date.now()}-${Math.random()}`;
 }
-function Fs(e) {
-  const t = rt(), s = it(), n = Vs(), { queue: a, enqueue: g, dequeue: l, remove: T } = Bs(), $ = I(!1), f = I(!1), M = I(!1), d = I(null), u = I(null), h = I(null), C = I(null), W = /* @__PURE__ */ new Map(), K = /* @__PURE__ */ new Map(), G = /* @__PURE__ */ new Set(), A = /* @__PURE__ */ new Map(), E = Math.min(Math.max(e.historyLimit ?? 80, 20), 300), Y = Math.min(Math.max(e.historyStep ?? 50, 20), 150);
+function Qs(e) {
+  const t = rt(), s = lt(), n = Hs(), { queue: a, enqueue: g, dequeue: l, remove: T } = Ks(), A = b(!1), h = b(!1), M = b(!1), d = b(null), u = b(null), p = b(null), S = b(null), P = /* @__PURE__ */ new Map(), K = /* @__PURE__ */ new Map(), G = /* @__PURE__ */ new Set(), _ = /* @__PURE__ */ new Map(), E = Math.min(Math.max(e.historyLimit ?? 80, 20), 300), Y = Math.min(Math.max(e.historyStep ?? 50, 20), 150);
   e.sessionId && (s.sessions.some((o) => o.id === e.sessionId) || s.createSession("新会话", e.sessionId, e.defaultAgentId ?? "main"), s.selectSession(e.sessionId)), t.setCurrentSession(s.currentId);
   function B() {
     return e.gatewayUrl.endsWith("/") ? e.gatewayUrl.slice(0, -1) : e.gatewayUrl;
   }
   function j(o) {
-    return W.get(o) ?? s.currentId;
+    return P.get(o) ?? s.currentId;
   }
-  function re(o) {
-    var q;
-    return (((q = s.sessions.find((D) => D.id === o)) == null ? void 0 : q.agentId) ?? e.defaultAgentId ?? "main").trim().replace(/[^a-zA-Z0-9_-]/g, "") || "main";
+  function ie(o) {
+    var W;
+    return (((W = s.sessions.find((U) => U.id === o)) == null ? void 0 : W.agentId) ?? e.defaultAgentId ?? "main").trim().replace(/[^a-zA-Z0-9_-]/g, "") || "main";
   }
-  function ae(o, p) {
-    return `${p}::${o}`;
+  function ae(o, C) {
+    return `${C}::${o}`;
   }
-  function N(o, p) {
-    const L = j(o);
-    t.updateMessage(L, o, p);
+  function O(o, C) {
+    const $ = j(o);
+    t.updateMessage($, o, C);
   }
-  function U(o) {
-    const p = j(o.messageId), L = K.get(o.messageId) ?? `ai-${o.messageId}`;
-    K.set(o.messageId, L), C.value = L, t.setStreaming(p, L), t.appendStreamContent(p, L, o.content), N(o.messageId, { status: "streaming" }), f.value = !1, $.value = !0;
+  function N(o) {
+    const C = j(o.messageId), $ = K.get(o.messageId) ?? `ai-${o.messageId}`;
+    K.set(o.messageId, $), S.value = $, t.setStreaming(C, $), t.appendStreamContent(C, $, o.content), O(o.messageId, { status: "streaming" }), h.value = !1, A.value = !0;
   }
-  function _(o) {
-    const p = o.reason ? String(o.reason).slice(0, 200) : void 0;
-    if (N(o.messageId, {
+  function L(o) {
+    const C = o.reason ? String(o.reason).slice(0, 200) : void 0;
+    if (O(o.messageId, {
       status: o.status,
-      statusReason: p
+      statusReason: C
     }), o.status === "accepted" || o.status === "processing") {
-      f.value = !0;
+      h.value = !0;
       return;
     }
     if (o.status === "streaming") {
-      f.value = !1, $.value = !0;
+      h.value = !1, A.value = !0;
       return;
     }
-    (o.status === "failed" || o.status === "aborted") && h.value === o.messageId && (f.value = !1);
+    (o.status === "failed" || o.status === "aborted") && p.value === o.messageId && (h.value = !1);
   }
   function Q(o) {
-    const p = j(o);
-    h.value === o && (h.value = null, C.value = null, f.value = !1, $.value = !1), t.setStreaming(p, null), W.delete(o), K.delete(o);
-    const L = l();
-    L && te(L.content, L.images);
+    const C = j(o);
+    p.value === o && (p.value = null, S.value = null, h.value = !1, A.value = !1), t.setStreaming(C, null), P.delete(o), K.delete(o);
+    const $ = l();
+    $ && se($.content, $.images);
   }
   async function V(o = {}) {
-    var se;
-    const p = (o.sessionId ?? s.currentId).trim();
-    if (!p || M.value)
+    var ne;
+    const C = (o.sessionId ?? s.currentId).trim();
+    if (!C || M.value)
       return;
-    const L = re(p), q = ae(p, L), D = A.get(q) ?? E, z = o.limit ?? (o.append ? D + Y : D), H = Math.min(Math.max(z, 20), 300), ee = (t.messages[p] ?? []).length > 0;
-    if (!(!o.force && !o.append && G.has(q) && ee)) {
-      A.set(q, H), d.value = null, M.value = !0;
+    const $ = ie(C), W = ae(C, $), U = _.get(W) ?? E, z = o.limit ?? (o.append ? U + Y : U), H = Math.min(Math.max(z, 20), 300), ee = (t.messages[C] ?? []).length > 0;
+    if (!(!o.force && !o.append && G.has(W) && ee)) {
+      _.set(W, H), d.value = null, M.value = !0;
       try {
         const F = await fetch(
-          `${B()}/sessions/${encodeURIComponent(p)}/history?limit=${H}&agentId=${encodeURIComponent(L)}`
+          `${B()}/sessions/${encodeURIComponent(C)}/history?limit=${H}&agentId=${encodeURIComponent($)}`
         );
         if (!F.ok)
           throw new Error(`HTTP ${F.status}`);
-        const ne = (await F.json()).messages.filter((Z) => typeof Z.content == "string" && Z.content.trim().length > 0).map((Z) => ({
+        const oe = (await F.json()).messages.filter((Z) => typeof Z.content == "string" && Z.content.trim().length > 0).map((Z) => ({
           id: Z.id,
           role: Z.role,
           content: Z.content,
           timestamp: Z.timestamp,
           status: Z.role === "user" ? "delivered" : "sent"
         }));
-        o.replace ? t.setSessionMessages(p, ne) : t.mergeMessages(p, ne);
-        const $e = ((se = t.messages[p]) == null ? void 0 : se.length) ?? ne.length, he = [...ne].reverse().find((Z) => Z.role !== "system") ?? ne[ne.length - 1];
-        he && s.syncSessionSnapshot(p, {
-          lastMessage: he.content,
-          messageCount: $e,
-          updatedAt: he.timestamp
-        }), G.add(q);
+        o.replace ? t.setSessionMessages(C, oe) : t.mergeMessages(C, oe);
+        const pe = ((ne = t.messages[C]) == null ? void 0 : ne.length) ?? oe.length, ve = [...oe].reverse().find((Z) => Z.role !== "system") ?? oe[oe.length - 1];
+        ve && s.syncSessionSnapshot(C, {
+          lastMessage: ve.content,
+          messageCount: pe,
+          updatedAt: ve.timestamp
+        }), G.add(W);
       } catch (F) {
         d.value = F instanceof Error ? F.message : String(F);
       } finally {
@@ -1160,36 +1168,36 @@ function Fs(e) {
     }
   }
   function X(o) {
-    var p, L, q, D;
+    var C, $, W, U;
     switch (o.type) {
       case "connected": {
         n.setStatus("connected");
         break;
       }
       case "auth_failed": {
-        n.setStatus("error", o.error), f.value = !1, $.value = !1;
+        n.setStatus("error", o.error), h.value = !1, A.value = !1;
         break;
       }
       case "message_received": {
-        N(o.messageId, {
+        O(o.messageId, {
           status: o.duplicate ? "processing" : "accepted"
-        }), f.value = !0, o.duplicate && ($.value = !0);
+        }), h.value = !0, o.duplicate && (A.value = !0);
         break;
       }
       case "message_status": {
-        _(o);
+        L(o);
         break;
       }
       case "chunk": {
-        U(o);
+        N(o);
         break;
       }
       case "stream_end": {
         if (o.error) {
           const z = o.aborted ? "aborted" : "failed";
-          N(o.messageId, { status: z });
+          O(o.messageId, { status: z });
         } else
-          N(o.messageId, { status: "delivered" });
+          O(o.messageId, { status: "delivered" });
         Q(o.messageId);
         break;
       }
@@ -1201,25 +1209,25 @@ function Fs(e) {
           content: o.content,
           timestamp: o.timestamp,
           status: "delivered"
-        }), s.touchSession(z, o.content), f.value = !1, $.value = !1;
+        }), s.touchSession(z, o.content), h.value = !1, A.value = !1;
         break;
       }
       case "stopped": {
-        N(o.messageId, {
+        O(o.messageId, {
           status: "aborted",
           statusReason: o.noop ? "noop" : "stopped_by_user"
         }), Q(o.messageId);
         break;
       }
       case "error": {
-        const z = (p = o.error) == null ? void 0 : p.details, H = ((L = o.error) == null ? void 0 : L.message) ?? "Unknown websocket error", ee = ((q = o.error) == null ? void 0 : q.reason) ?? (z == null ? void 0 : z.reason) ?? H, se = ((D = o.error) == null ? void 0 : D.messageId) ?? (z == null ? void 0 : z.messageId);
-        n.setStatus("error", H), se ? (N(se, {
+        const z = (C = o.error) == null ? void 0 : C.details, H = (($ = o.error) == null ? void 0 : $.message) ?? "Unknown websocket error", ee = ((W = o.error) == null ? void 0 : W.reason) ?? (z == null ? void 0 : z.reason) ?? H, ne = ((U = o.error) == null ? void 0 : U.messageId) ?? (z == null ? void 0 : z.messageId);
+        n.setStatus("error", H), ne ? (O(ne, {
           status: "failed",
           statusReason: ee
-        }), Q(se)) : h.value && (N(h.value, {
+        }), Q(ne)) : p.value && (O(p.value, {
           status: "failed",
           statusReason: ee
-        }), Q(h.value)), f.value = !1, $.value = !1;
+        }), Q(p.value)), h.value = !1, A.value = !1;
         break;
       }
       case "server_closing": {
@@ -1228,20 +1236,20 @@ function Fs(e) {
       }
     }
   }
-  const R = zs({
+  const R = Fs({
     gatewayUrl: e.gatewayUrl,
     token: e.token,
     reconnectMax: e.reconnectMax,
     reconnectDelay: e.reconnectDelay,
     onMessage: X,
     onConnect: () => {
-      if (n.setStatus("connected"), n.resetReconnect(), !h.value && !$.value) {
+      if (n.setStatus("connected"), n.resetReconnect(), !p.value && !A.value) {
         const o = l();
-        o && te(o.content, o.images);
+        o && se(o.content, o.images);
       }
     },
     onDisconnect: () => {
-      n.setStatus("disconnected"), h.value && N(h.value, {
+      n.setStatus("disconnected"), p.value && O(p.value, {
         status: "pending",
         statusReason: "connection_lost"
       });
@@ -1250,58 +1258,58 @@ function Fs(e) {
       n.setStatus("error", "WebSocket error");
     }
   });
-  async function te(o, p) {
-    const L = o.trim();
-    if (!L)
+  async function se(o, C) {
+    const $ = o.trim();
+    if (!$)
       return;
-    const q = e.maxMessageLength ?? 4e3;
-    if (L.length > q)
-      throw new Error(`Message exceeds max length: ${q}`);
-    const D = s.currentId, z = re(D), H = Hs(), ee = p == null ? void 0 : p.map((F) => ({
+    const W = e.maxMessageLength ?? 4e3;
+    if ($.length > W)
+      throw new Error(`Message exceeds max length: ${W}`);
+    const U = s.currentId, z = ie(U), H = js(), ee = C == null ? void 0 : C.map((F) => ({
       url: URL.createObjectURL(F)
     }));
-    t.addMessage(D, {
+    t.addMessage(U, {
       id: H,
       role: "user",
       content: u.value ? `> ${u.value.content}
 
-${L}` : L,
+${$}` : $,
       timestamp: Date.now(),
       images: ee,
       status: "pending"
-    }), s.touchSession(D, L), h.value = H, C.value = `ai-${H}`, W.set(H, D), K.set(H, C.value), t.setStreaming(D, C.value), f.value = !0, $.value = !1;
-    const se = ee == null ? void 0 : ee.map((F) => F.url);
+    }), s.touchSession(U, $), p.value = H, S.value = `ai-${H}`, P.set(H, U), K.set(H, S.value), t.setStreaming(U, S.value), h.value = !0, A.value = !1;
+    const ne = ee == null ? void 0 : ee.map((F) => F.url);
     try {
       R.send({
         type: "chat",
         payload: {
-          content: L,
-          sessionId: D,
+          content: $,
+          sessionId: U,
           messageId: H,
           agentId: z,
-          attachments: se
+          attachments: ne
         }
       });
     } catch (F) {
-      const ue = F instanceof Error ? F.message : "Failed to send message";
-      N(H, {
+      const he = F instanceof Error ? F.message : "Failed to send message";
+      O(H, {
         status: "failed",
-        statusReason: ue
-      }), Q(H), n.setStatus("error", ue);
+        statusReason: he
+      }), Q(H), n.setStatus("error", he);
     }
     u.value = null;
   }
-  async function c(o, p) {
-    if (f.value || $.value) {
-      g({ content: o, images: p });
+  async function c(o, C) {
+    if (h.value || A.value) {
+      g({ content: o, images: C });
       return;
     }
-    await te(o, p);
+    await se(o, C);
   }
   function m() {
-    if (!h.value)
+    if (!p.value)
       return;
-    const o = h.value;
+    const o = p.value;
     try {
       R.send({
         type: "stop",
@@ -1311,38 +1319,38 @@ ${L}` : L,
       });
     } catch {
     }
-    N(o, {
+    O(o, {
       status: "aborted",
       statusReason: "stopped_by_user"
     }), Q(o);
   }
-  function b(o) {
+  function w(o) {
     u.value = o;
   }
   function J(o) {
-    const p = t.currentMessages, L = p.findIndex((D) => D.id === o);
-    if (L === -1)
+    const C = t.currentMessages, $ = C.findIndex((U) => U.id === o);
+    if ($ === -1)
       return;
-    let q = p[L];
-    if (q.role !== "user") {
-      for (let D = L - 1; D >= 0; D -= 1)
-        if (p[D].role === "user") {
-          q = p[D];
+    let W = C[$];
+    if (W.role !== "user") {
+      for (let U = $ - 1; U >= 0; U -= 1)
+        if (C[U].role === "user") {
+          W = C[U];
           break;
         }
     }
-    q.role === "user" && c(q.content);
+    W.role === "user" && c(W.content);
   }
-  function fe() {
+  function de() {
     return R.connect();
   }
-  function Me(o) {
+  function $e(o) {
     T(o);
   }
   return {
     messages: x(() => t.currentMessages),
-    isStreaming: $,
-    isLoading: f,
+    isStreaming: A,
+    isLoading: h,
     isConnected: x(() => R.status.value === "connected"),
     status: x(() => R.status.value),
     reconnectCount: x(() => R.reconnectCount.value),
@@ -1350,32 +1358,32 @@ ${L}` : L,
     quoteMessage: u,
     send: c,
     stop: m,
-    quote: b,
+    quote: w,
     retry: J,
-    connect: fe,
+    connect: de,
     loadHistory: V,
     disconnect: R.disconnect,
     reconnect: R.reconnect,
-    removeFromQueue: Me,
+    removeFromQueue: $e,
     isHistoryLoading: M,
     historyError: d
   };
 }
-function Ks(e) {
+function Gs(e) {
   return e || (typeof localStorage > "u" ? "system" : localStorage.getItem("openclaw:theme") ?? "system");
 }
-function js() {
+function Ys() {
   return typeof window < "u" && window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
-function Qs(e) {
-  const t = I(Ks(e)), s = x(() => t.value === "system" ? js() : t.value === "dark");
+function Xs(e) {
+  const t = b(Gs(e)), s = x(() => t.value === "system" ? Ys() : t.value === "dark");
   function n(g) {
     t.value = g, typeof localStorage < "u" && localStorage.setItem("openclaw:theme", g);
   }
   function a() {
     n(s.value ? "light" : "dark");
   }
-  return kt(() => {
+  return $t(() => {
     typeof document > "u" || (document.documentElement.dataset.openclawTheme = s.value ? "dark" : "light");
   }), {
     theme: t,
@@ -1384,7 +1392,7 @@ function Qs(e) {
     toggle: a
   };
 }
-const Gs = {}, le = {
+const Zs = {}, le = {
   autoScroll: !0,
   enableTypingIndicator: !0,
   maxFileSize: 10 * 1024 * 1024,
@@ -1397,7 +1405,7 @@ const Gs = {}, le = {
     id: "main",
     name: "main"
   }
-], lt = {
+], ut = {
   mode: "system"
 }, Le = {
   gatewayUrl: "http://127.0.0.1:3000",
@@ -1407,10 +1415,10 @@ const Gs = {}, le = {
   defaultAgentId: "main",
   agents: _e,
   locale: "auto",
-  theme: lt,
+  theme: ut,
   options: le
 };
-function Ys(e) {
+function Js(e) {
   if (typeof e != "string")
     return _e;
   const t = e.split(",").map((s) => s.trim()).filter(Boolean).map((s) => {
@@ -1425,12 +1433,12 @@ function Ys(e) {
     name: "main"
   }), t);
 }
-function ut(e = {}) {
+function ct(e = {}) {
   return {
     ...Le,
     ...e,
     theme: {
-      ...lt,
+      ...ut,
       ...e.theme ?? {}
     },
     options: {
@@ -1439,13 +1447,13 @@ function ut(e = {}) {
     }
   };
 }
-function vn(e) {
-  const t = e ?? Gs ?? {};
-  return ut({
+function Mn(e) {
+  const t = e ?? Zs ?? {};
+  return ct({
     gatewayUrl: String(t.VITE_OPENCLAW_GATEWAY_URL ?? Le.gatewayUrl),
     token: String(t.VITE_OPENCLAW_TOKEN ?? ""),
     defaultAgentId: String(t.VITE_OPENCLAW_DEFAULT_AGENT_ID ?? Le.defaultAgentId),
-    agents: Ys(t.VITE_OPENCLAW_AGENTS),
+    agents: Js(t.VITE_OPENCLAW_AGENTS),
     locale: String(t.VITE_OPENCLAW_LOCALE ?? "auto"),
     theme: {
       mode: t.VITE_OPENCLAW_THEME ?? "system"
@@ -1461,10 +1469,10 @@ function vn(e) {
     }
   });
 }
-const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, Js = { class: "oc-title-block" }, en = { class: "oc-chat-header-actions" }, tn = { class: "oc-agent-picker" }, sn = ["value"], nn = { class: "oc-chat-body" }, an = { class: "oc-chat-main" }, on = {
+const en = { class: "oc-chat-header" }, tn = { class: "oc-chat-header-main" }, sn = { class: "oc-title-block" }, nn = { class: "oc-chat-header-actions" }, an = { class: "oc-chat-body" }, on = { class: "oc-agent-rail" }, rn = { class: "oc-agent-list" }, ln = ["title", "onClick"], un = { class: "oc-agent-avatar" }, cn = { class: "oc-chat-main" }, dn = { class: "oc-main-topbar" }, gn = { class: "oc-agent-picker" }, mn = ["value"], fn = {
   key: 0,
   class: "oc-offline"
-}, rn = ["src"], ln = /* @__PURE__ */ Se({
+}, hn = ["src"], pn = /* @__PURE__ */ Ce({
   __name: "ChatContainer",
   props: {
     gatewayUrl: { default: "" },
@@ -1480,25 +1488,25 @@ const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, J
   },
   emits: ["connect", "disconnect", "error", "message", "session-change"],
   setup(e, { emit: t }) {
-    var xe, De, Re, Ue, Ne, Oe, qe, We, Pe, Ve, ze, Be;
-    Ps();
-    const s = e, n = t, a = ut({
+    var De, Re, Ue, Ne, Oe, qe, We, Pe, ze, Ve, Be, He;
+    Bs();
+    const s = e, n = t, a = ct({
       ...s.initConfig,
-      gatewayUrl: s.gatewayUrl || ((xe = s.initConfig) == null ? void 0 : xe.gatewayUrl),
-      token: s.token || ((De = s.initConfig) == null ? void 0 : De.token),
-      sessionId: s.sessionId || ((Re = s.initConfig) == null ? void 0 : Re.sessionId),
-      userId: s.userId || ((Ue = s.initConfig) == null ? void 0 : Ue.userId),
-      defaultAgentId: s.defaultAgentId || ((Ne = s.initConfig) == null ? void 0 : Ne.defaultAgentId),
-      agents: (Oe = s.agents) != null && Oe.length ? s.agents : (qe = s.initConfig) == null ? void 0 : qe.agents,
-      locale: s.locale !== "auto" ? s.locale : (We = s.initConfig) == null ? void 0 : We.locale,
-      theme: s.theme ?? ((Pe = s.initConfig) == null ? void 0 : Pe.theme),
+      gatewayUrl: s.gatewayUrl || ((De = s.initConfig) == null ? void 0 : De.gatewayUrl),
+      token: s.token || ((Re = s.initConfig) == null ? void 0 : Re.token),
+      sessionId: s.sessionId || ((Ue = s.initConfig) == null ? void 0 : Ue.sessionId),
+      userId: s.userId || ((Ne = s.initConfig) == null ? void 0 : Ne.userId),
+      defaultAgentId: s.defaultAgentId || ((Oe = s.initConfig) == null ? void 0 : Oe.defaultAgentId),
+      agents: (qe = s.agents) != null && qe.length ? s.agents : (We = s.initConfig) == null ? void 0 : We.agents,
+      locale: s.locale !== "auto" ? s.locale : (Pe = s.initConfig) == null ? void 0 : Pe.locale,
+      theme: s.theme ?? ((ze = s.initConfig) == null ? void 0 : ze.theme),
       options: {
         ...((Ve = s.initConfig) == null ? void 0 : Ve.options) ?? {},
         ...s.options ?? {}
       }
-    }), g = rt(), l = it(), { sortedSessions: T, currentSession: $ } = yt(l);
-    a.sessionId && !l.sessions.some((r) => r.id === a.sessionId) && l.createSession("新会话", a.sessionId, a.defaultAgentId), a.sessionId && l.selectSession(a.sessionId), (ze = l.currentSession) != null && ze.agentId || l.updateAgent(l.currentId, a.defaultAgentId), g.setCurrentSession(l.currentId);
-    const { t: f, locale: M, setLocale: d } = Ce(), { isDark: u, toggle: h } = Qs(a.theme.mode), C = I(
+    }), g = rt(), l = lt(), { sortedSessions: T, currentSession: A } = St(l);
+    a.sessionId && !l.sessions.some((r) => r.id === a.sessionId) && l.createSession("新会话", a.sessionId, a.defaultAgentId), a.sessionId && l.selectSession(a.sessionId), (Be = l.currentSession) != null && Be.agentId || l.updateAgent(l.currentId, a.defaultAgentId), g.setCurrentSession(l.currentId);
+    const { t: h, locale: M, setLocale: d } = Ie(), { isDark: u, toggle: p } = Xs(a.theme.mode), S = b(
       a.agents.length > 0 ? a.agents : [
         {
           id: a.defaultAgentId,
@@ -1508,22 +1516,22 @@ const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, J
     );
     a.locale && a.locale !== "auto" && d(a.locale);
     const {
-      messages: W,
+      messages: P,
       isStreaming: K,
       isLoading: G,
-      isConnected: A,
+      isConnected: _,
       status: E,
       queue: Y,
       send: B,
       stop: j,
-      quote: re,
+      quote: ie,
       retry: ae,
-      connect: N,
-      reconnect: U,
-      loadHistory: _,
+      connect: O,
+      reconnect: N,
+      loadHistory: L,
       isHistoryLoading: Q,
       historyError: V
-    } = Fs({
+    } = Qs({
       gatewayUrl: a.gatewayUrl,
       token: a.token,
       sessionId: l.currentId,
@@ -1531,73 +1539,73 @@ const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, J
       reconnectDelay: a.options.reconnectDelay,
       reconnectMax: a.options.reconnectMax,
       maxMessageLength: a.options.maxMessageLength
-    }), X = I(""), R = I(!0), te = I(!1), c = I(""), m = I(null), b = I(((Be = l.currentSession) == null ? void 0 : Be.agentId) ?? a.defaultAgentId), J = x(() => l.currentId), fe = x(
-      () => Object.fromEntries(C.value.map((r) => [r.id, r.name]))
-    ), Me = x(() => g.streamingMessageId ?? ""), o = x(() => E.value === "connected" ? f("status.connected") : E.value === "reconnecting" ? `${f("status.reconnecting")} (${Y.value.length})` : f("chat.disconnected"));
-    function p(r) {
+    }), X = b(""), R = b(!0), se = b(!1), c = b(""), m = b(null), w = b(((He = l.currentSession) == null ? void 0 : He.agentId) ?? a.defaultAgentId), J = x(() => l.currentId), de = x(
+      () => Object.fromEntries(S.value.map((r) => [r.id, r.name]))
+    ), $e = x(() => de.value[w.value] ?? w.value), o = x(() => g.streamingMessageId ?? ""), C = x(() => E.value === "connected" ? h("status.connected") : E.value === "reconnecting" ? `${h("status.reconnecting")} (${Y.value.length})` : h("chat.disconnected"));
+    function $(r) {
       return (r ?? "").trim().replace(/[^a-zA-Z0-9_-]/g, "") || a.defaultAgentId || "main";
     }
-    function L() {
+    function W() {
       return a.gatewayUrl.endsWith("/") ? a.gatewayUrl.slice(0, -1) : a.gatewayUrl;
     }
-    async function q() {
+    async function U() {
       try {
-        const r = await fetch(`${L()}/agents`);
+        const r = await fetch(`${W()}/agents`);
         if (!r.ok)
           return;
-        const S = await r.json();
-        if (!Array.isArray(S.agents) || S.agents.length === 0)
+        const f = await r.json();
+        if (!Array.isArray(f.agents) || f.agents.length === 0)
           return;
-        C.value = S.agents.map((pe) => {
-          var He;
+        S.value = f.agents.map((ge) => {
+          var Fe;
           return {
-            id: p(pe.id),
-            name: ((He = pe.name) == null ? void 0 : He.trim()) || pe.id
+            id: $(ge.id),
+            name: ((Fe = ge.name) == null ? void 0 : Fe.trim()) || ge.id
           };
         });
-        const ie = p(S.defaultAgentId), P = b.value;
-        C.value.some((pe) => pe.id === P) || (b.value = ie, l.updateAgent(l.currentId, ie));
+        const re = $(f.defaultAgentId), D = w.value;
+        S.value.some((ge) => ge.id === D) || (w.value = re, l.updateAgent(l.currentId, re));
       } catch {
       }
     }
-    function D(r) {
+    function z(r) {
       if ((r.metaKey || r.ctrlKey) && r.shiftKey && r.key.toLowerCase() === "l") {
-        r.preventDefault(), h();
+        r.preventDefault(), p();
         return;
       }
       (r.metaKey || r.ctrlKey) && r.key.toLowerCase() === "b" && (r.preventDefault(), R.value = !R.value);
     }
-    Xe(async () => {
-      window.addEventListener("keydown", D);
+    Ze(async () => {
+      window.addEventListener("keydown", z);
       try {
-        await N(), await q(), await _({ force: !0 }), n("connect");
+        await O(), await U(), await L({ force: !0 }), n("connect");
       } catch (r) {
         n("error", { error: r instanceof Error ? r.message : "connect failed" });
       }
-    }), Ze(() => {
-      window.removeEventListener("keydown", D);
-    }), ce(
+    }), Je(() => {
+      window.removeEventListener("keydown", z);
+    }), me(
       () => l.currentId,
-      (r, S) => {
-        var P;
-        if (r === S)
+      (r, f) => {
+        var D;
+        if (r === f)
           return;
         g.setCurrentSession(r);
-        const ie = l.currentSession;
-        ie && !ie.agentId && l.updateAgent(r, a.defaultAgentId), b.value = ((P = l.currentSession) == null ? void 0 : P.agentId) ?? a.defaultAgentId, n("session-change", { sessionId: r }), _({ sessionId: r, replace: !0 });
+        const re = l.currentSession;
+        re && !re.agentId && l.updateAgent(r, a.defaultAgentId), w.value = ((D = l.currentSession) == null ? void 0 : D.agentId) ?? a.defaultAgentId, n("session-change", { sessionId: r }), L({ sessionId: r, replace: !0 });
       }
-    ), ce(
+    ), me(
       () => E.value,
       (r) => {
         r === "error" && n("error", { error: "WebSocket connection error" }), r === "disconnected" && n("disconnect", { reason: "socket closed" });
       }
-    ), ce(
+    ), me(
       () => V.value,
       (r) => {
         r && n("error", { error: `History sync failed: ${r}` });
       }
-    ), ce(
-      () => W.value.at(-1),
+    ), me(
+      () => P.value.at(-1),
       (r) => {
         r && n("message", {
           message: r,
@@ -1605,22 +1613,22 @@ const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, J
         });
       }
     );
-    async function z(r, S) {
-      await B(r, S), X.value = "";
+    async function H(r, f) {
+      await B(r, f), X.value = "";
     }
-    function H(r) {
+    function ee(r) {
     }
-    function ee(r, S) {
+    function ne(r, f) {
       if (r === "new") {
-        ne();
+        pe();
         return;
       }
       if (r === "clear") {
-        ue(l.currentId);
+        oe(l.currentId);
         return;
       }
       if (r === "model") {
-        X.value = `/model ${S}`.trim();
+        X.value = `/model ${f}`.trim();
         return;
       }
       r === "help" && g.addMessage(l.currentId, {
@@ -1631,13 +1639,13 @@ const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, J
         status: "sent"
       });
     }
-    function se(r) {
+    function F(r) {
       l.selectSession(r), g.setCurrentSession(r);
     }
-    function F(r) {
+    function he(r) {
       l.deleteSession(r), g.clearMessages(r);
     }
-    function ue(r) {
+    function oe(r) {
       g.clearMessages(r), g.addMessage(r, {
         id: `${Date.now()}`,
         role: "system",
@@ -1646,201 +1654,229 @@ const Xs = { class: "oc-chat-header" }, Zs = { class: "oc-chat-header-main" }, J
         status: "sent"
       }), l.resetSession(r);
     }
-    function ne() {
-      const r = l.createSession(f("chat.newSession"), void 0, b.value);
+    function pe() {
+      const r = l.createSession(h("chat.newSession"), void 0, w.value);
       g.setCurrentSession(r.id), window.innerWidth < 900 && (R.value = !1);
     }
-    function $e(r) {
-    }
-    function he(r) {
-      c.value = r, te.value = !0;
+    function ve(r) {
     }
     function Z(r) {
-      ae(r);
-    }
-    function ct(r) {
-      re(r), X.value = `> ${r.content}
-`;
+      c.value = r, se.value = !0;
     }
     function dt(r) {
+      ae(r);
+    }
+    function gt(r) {
+      ie(r), X.value = `> ${r.content}
+`;
+    }
+    function mt(r) {
       g.deleteMessage(l.currentId, r);
     }
-    function gt() {
-      _({
+    function ft() {
+      L({
         sessionId: l.currentId,
         append: !0,
         force: !0
       });
     }
-    function mt() {
-      const r = p(b.value), S = l.currentSession;
-      S && S.agentId !== r && (l.updateAgent(S.id, r), g.clearMessages(S.id), _({
-        sessionId: S.id,
+    function xe() {
+      const r = $(w.value), f = l.currentSession;
+      f && f.agentId !== r && (l.updateAgent(f.id, r), g.clearMessages(f.id), L({
+        sessionId: f.id,
         force: !0,
         replace: !0
       }));
     }
-    function ft() {
+    function ht(r) {
+      w.value = $(r), xe();
+    }
+    function pt() {
       d(M.value === "zh-CN" ? "en" : "zh-CN");
     }
-    function ht() {
-      U();
+    function vt() {
+      N();
     }
-    return (r, S) => {
-      var ie;
-      return y(), w("section", {
-        class: oe(["openclaw-chat oc-chat-shell", { "is-dark": v(u) }])
+    return (r, f) => {
+      var re;
+      return v(), y("section", {
+        class: te(["openclaw-chat oc-chat-shell", { "is-dark": I(u) }])
       }, [
-        S[8] || (S[8] = i("div", { class: "oc-bg-orb oc-bg-orb-a" }, null, -1)),
-        S[9] || (S[9] = i("div", { class: "oc-bg-orb oc-bg-orb-b" }, null, -1)),
-        i("header", Xs, [
-          i("div", Zs, [
+        f[11] || (f[11] = i("div", { class: "oc-grid-overlay" }, null, -1)),
+        f[12] || (f[12] = i("div", { class: "oc-bg-orb oc-bg-orb-a" }, null, -1)),
+        f[13] || (f[13] = i("div", { class: "oc-bg-orb oc-bg-orb-b" }, null, -1)),
+        i("header", en, [
+          i("div", tn, [
             i("button", {
               type: "button",
               class: "oc-mobile-menu",
               "aria-label": "Toggle sessions",
-              onClick: S[0] || (S[0] = (P) => R.value = !R.value)
+              onClick: f[0] || (f[0] = (D) => R.value = !R.value)
             }, "☰"),
-            i("div", Js, [
-              i("strong", null, k(((ie = v($)) == null ? void 0 : ie.title) || v(f)("chat.title")), 1),
-              i("p", null, "Web Channel · " + k(o.value), 1)
+            i("div", sn, [
+              i("strong", null, k(((re = I(A)) == null ? void 0 : re.title) || I(h)("chat.title")), 1),
+              i("p", null, k($e.value) + " · Web Channel", 1)
             ])
           ]),
-          i("div", en, [
-            i("label", tn, [
-              i("span", null, k(v(f)("chat.agent")), 1),
-              Ee(i("select", {
-                "onUpdate:modelValue": S[1] || (S[1] = (P) => b.value = P),
-                onChange: mt
-              }, [
-                (y(!0), w(ge, null, me(C.value, (P) => (y(), w("option", {
-                  key: P.id,
-                  value: P.id
-                }, k(P.name), 9, sn))), 128))
-              ], 544), [
-                [Mt, b.value]
-              ])
-            ]),
+          i("div", nn, [
             i("span", {
-              class: oe(["oc-connection", v(E)])
+              class: te(["oc-connection", I(E)])
             }, [
-              S[7] || (S[7] = i("span", { class: "dot" }, null, -1)),
-              we(" " + k(o.value), 1)
+              f[7] || (f[7] = i("span", { class: "dot" }, null, -1)),
+              Se(" " + k(C.value), 1)
             ], 2),
             i("button", {
               type: "button",
-              onClick: S[2] || (S[2] = //@ts-ignore
-              (...P) => v(h) && v(h)(...P))
-            }, k(v(u) ? "Light" : "Dark"), 1),
+              class: "oc-pill-btn",
+              onClick: f[1] || (f[1] = //@ts-ignore
+              (...D) => I(p) && I(p)(...D))
+            }, k(I(u) ? "Light" : "Dark"), 1),
             i("button", {
               type: "button",
-              onClick: ft
-            }, k(v(M) === "zh-CN" ? "EN" : "中文"), 1),
+              class: "oc-pill-btn",
+              onClick: pt
+            }, k(I(M) === "zh-CN" ? "EN" : "中文"), 1),
             i("button", {
               type: "button",
-              class: "primary",
-              onClick: ne
-            }, k(v(f)("chat.newSession")), 1)
+              class: "oc-pill-btn primary",
+              onClick: pe
+            }, k(I(h)("chat.newSession")), 1)
           ])
         ]),
-        i("div", nn, [
-          R.value ? (y(), w("div", {
+        i("div", an, [
+          R.value ? (v(), y("div", {
             key: 0,
             class: "oc-sidebar-mask",
-            onClick: S[3] || (S[3] = (P) => R.value = !1)
-          })) : O("", !0),
-          ve(ot, {
-            visible: R.value,
-            "onUpdate:visible": S[4] || (S[4] = (P) => R.value = P),
-            sessions: v(T),
-            "current-id": J.value,
-            "agent-labels": fe.value,
-            onSelect: se,
-            onDelete: F,
-            onReset: ue,
-            onNew: ne
-          }, null, 8, ["visible", "sessions", "current-id", "agent-labels"]),
-          i("main", an, [
-            ve(at, {
+            onClick: f[2] || (f[2] = (D) => R.value = !1)
+          })) : q("", !0),
+          i("div", {
+            class: te(["oc-left-zone", { hidden: !R.value }])
+          }, [
+            i("aside", on, [
+              f[9] || (f[9] = i("div", { class: "oc-agent-rail-head" }, "AG", -1)),
+              i("div", rn, [
+                (v(!0), y(ue, null, ce(S.value, (D) => (v(), y("button", {
+                  key: D.id,
+                  type: "button",
+                  class: te(["oc-agent-item", { active: w.value === D.id }]),
+                  title: D.name,
+                  onClick: (ge) => ht(D.id)
+                }, [
+                  i("span", un, k(D.name.slice(0, 2).toUpperCase()), 1),
+                  f[8] || (f[8] = i("span", { class: "oc-agent-dot" }, null, -1))
+                ], 10, ln))), 128))
+              ])
+            ]),
+            ye(it, {
+              visible: R.value,
+              "onUpdate:visible": f[3] || (f[3] = (D) => R.value = D),
+              sessions: I(T),
+              "current-id": J.value,
+              "agent-labels": de.value,
+              onSelect: F,
+              onDelete: he,
+              onReset: oe,
+              onNew: pe
+            }, null, 8, ["visible", "sessions", "current-id", "agent-labels"])
+          ], 2),
+          i("main", cn, [
+            i("div", dn, [
+              i("label", gn, [
+                i("span", null, k(I(h)("chat.agent")), 1),
+                Ee(i("select", {
+                  "onUpdate:modelValue": f[4] || (f[4] = (D) => w.value = D),
+                  onChange: xe
+                }, [
+                  (v(!0), y(ue, null, ce(S.value, (D) => (v(), y("option", {
+                    key: D.id,
+                    value: D.id
+                  }, k(D.name), 9, mn))), 128))
+                ], 544), [
+                  [At, w.value]
+                ])
+              ]),
+              f[10] || (f[10] = i("p", { class: "oc-shortcuts" }, "⌘/Ctrl+B · ⌘/Ctrl+Shift+L", -1))
+            ]),
+            ye(ot, {
               ref_key: "messageListRef",
               ref: m,
-              messages: v(W),
-              streaming: v(K),
-              "streaming-message-id": Me.value,
-              loading: v(G) || v(Q),
-              onCopy: $e,
-              onPreviewImage: he,
-              onRegenerate: Z,
-              onQuote: ct,
-              onDelete: dt,
-              onScrollTop: gt
+              messages: I(P),
+              streaming: I(K),
+              "streaming-message-id": o.value,
+              loading: I(G) || I(Q),
+              onCopy: ve,
+              onPreviewImage: Z,
+              onRegenerate: dt,
+              onQuote: gt,
+              onDelete: mt,
+              onScrollTop: ft
             }, null, 8, ["messages", "streaming", "streaming-message-id", "loading"]),
-            ve($t, { name: "oc-fade" }, {
-              default: et(() => [
-                v(A) ? O("", !0) : (y(), w("div", on, [
-                  i("span", null, k(v(f)("chat.disconnected")), 1),
+            ye(_t, { name: "oc-fade" }, {
+              default: tt(() => [
+                I(_) ? q("", !0) : (v(), y("div", fn, [
+                  i("span", null, k(I(h)("chat.disconnected")), 1),
                   i("button", {
                     type: "button",
-                    onClick: ht
-                  }, k(v(f)("chat.reconnect")), 1)
+                    onClick: vt
+                  }, k(I(h)("chat.reconnect")), 1)
                 ]))
               ]),
               _: 1
             }),
-            ve(tt, {
+            ye(st, {
               modelValue: X.value,
-              "onUpdate:modelValue": S[5] || (S[5] = (P) => X.value = P),
-              disabled: v(G) && !v(K),
+              "onUpdate:modelValue": f[5] || (f[5] = (D) => X.value = D),
+              disabled: I(G) && !I(K),
               uploading: !1,
-              loading: v(K),
-              "queued-count": v(Y).length,
-              "max-length": v(a).options.maxMessageLength,
-              onSend: z,
-              onUpload: H,
-              onCommand: ee,
-              onStop: v(j)
+              loading: I(K),
+              "queued-count": I(Y).length,
+              "max-length": I(a).options.maxMessageLength,
+              onSend: H,
+              onUpload: ee,
+              onCommand: ne,
+              onStop: I(j)
             }, null, 8, ["modelValue", "disabled", "loading", "queued-count", "max-length", "onStop"])
           ])
         ]),
-        te.value ? (y(), w("dialog", {
+        se.value ? (v(), y("dialog", {
           key: 0,
           class: "oc-preview",
           open: "",
-          onClick: S[6] || (S[6] = (P) => te.value = !1)
+          onClick: f[6] || (f[6] = (D) => se.value = !1)
         }, [
           i("img", {
             src: c.value,
             alt: "preview"
-          }, null, 8, rn)
-        ])) : O("", !0)
+          }, null, 8, hn)
+        ])) : q("", !0)
       ], 2);
     };
   }
-}), un = /* @__PURE__ */ Ie(ln, [["__scopeId", "data-v-0506875e"]]), cn = [un, at, nt, tt, ot];
-function dn(e) {
+}), vn = /* @__PURE__ */ be(pn, [["__scopeId", "data-v-122cd438"]]), yn = [vn, ot, at, st, it];
+function wn(e) {
   var s, n;
-  !!((n = (s = e._context) == null ? void 0 : s.provides) != null && n.pinia) || e.use(Ye()), e.use(ye);
-  for (const a of cn)
+  !!((n = (s = e._context) == null ? void 0 : s.provides) != null && n.pinia) || e.use(Xe()), e.use(we);
+  for (const a of yn)
     e.component(a.name ?? "OpenClawComponent", a);
 }
-const yn = {
-  install: dn
+const $n = {
+  install: wn
 };
 export {
-  un as ChatContainer,
-  tt as ChatInput,
-  nt as MessageItem,
-  at as MessageList,
-  ot as SessionList,
-  ut as createChatInitConfig,
-  vn as createChatInitConfigFromEnv,
-  yn as default,
+  vn as ChatContainer,
+  st as ChatInput,
+  at as MessageItem,
+  ot as MessageList,
+  it as SessionList,
+  ct as createChatInitConfig,
+  Mn as createChatInitConfigFromEnv,
+  $n as default,
   Le as defaultChatInitConfig,
-  lt as defaultThemeConfig,
-  ye as i18n,
-  Fs as useChat,
-  Ce as useI18n,
-  Qs as useTheme,
-  zs as useWebSocket
+  ut as defaultThemeConfig,
+  we as i18n,
+  Qs as useChat,
+  Ie as useI18n,
+  Xs as useTheme,
+  Fs as useWebSocket
 };
 //# sourceMappingURL=openclaw-web-channel-vue.js.map

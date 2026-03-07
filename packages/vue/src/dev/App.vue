@@ -36,24 +36,24 @@ const connected = ref(false);
 .playground-root {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  padding: 18px;
   background:
-    radial-gradient(circle at 15% 20%, rgba(15, 118, 110, 0.18), transparent 40%),
-    radial-gradient(circle at 80% 90%, rgba(15, 118, 110, 0.14), transparent 30%),
-    #e5efee;
-  font-family: 'Sora', 'Avenir Next', 'PingFang SC', sans-serif;
+    radial-gradient(circle at 8% 12%, rgba(59, 130, 246, 0.2), transparent 40%),
+    radial-gradient(circle at 90% 92%, rgba(99, 102, 241, 0.16), transparent 34%),
+    #eff4ff;
+  font-family: 'Space Grotesk', 'Sora', 'Avenir Next', 'PingFang SC', sans-serif;
 }
 
 .playground-panel {
-  border: 1px solid rgba(18, 77, 73, 0.2);
-  border-radius: 18px;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 22px;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 20px 30px rgba(6, 41, 39, 0.12);
-  color: #163533;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 36px rgba(15, 23, 42, 0.12);
+  color: #10213d;
 }
 
 .playground-panel h1 {
@@ -62,7 +62,7 @@ const connected = ref(false);
 }
 
 .playground-panel p {
-  color: #2f5551;
+  color: #334a71;
   line-height: 1.6;
 }
 
@@ -76,10 +76,10 @@ const connected = ref(false);
 }
 
 .playground-panel li {
-  border: 1px solid rgba(18, 77, 73, 0.15);
-  border-radius: 10px;
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 12px;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.64);
 }
 
 .playground-chat {
@@ -91,7 +91,7 @@ const connected = ref(false);
 }
 
 .playground-tip code {
-  background: #dff2ef;
+  background: #dbeafe;
   padding: 2px 6px;
   border-radius: 999px;
 }

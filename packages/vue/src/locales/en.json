@@ -10,6 +10,7 @@
   "input": {
     "placeholder": "Type your message...",
     "thinking": "Thinking...",
+    "send": "Send",
     "stop": "Stop",
     "queued": "Queued: {count}"
   },

@@ -195,7 +195,7 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
 <style scoped>
 .oc-message-item {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
   position: relative;
 }
@@ -209,28 +209,30 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
 }
 
 .oc-message-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.04em;
-  background: color-mix(in srgb, var(--oc-color-primary) 20%, transparent);
-  color: var(--oc-color-primary);
-  border: 1px solid color-mix(in srgb, var(--oc-color-primary) 26%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--oc-color-primary) 84%, #fff), color-mix(in srgb, var(--oc-color-accent) 84%, #fff));
+  color: #f8fbff;
+  border: 1px solid color-mix(in srgb, var(--oc-color-primary) 46%, transparent);
+  box-shadow: 0 10px 18px color-mix(in srgb, var(--oc-color-primary) 24%, transparent);
 }
 
 .oc-message-content {
   max-width: min(90%, 720px);
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .oc-message-header {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   color: var(--oc-color-muted);
   font-size: 12px;
@@ -242,18 +244,20 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
 
 .oc-message-body {
   border-radius: var(--oc-radius);
-  border: 1px solid var(--oc-color-border);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 80%, transparent);
   background: var(--oc-color-assistant-bubble);
-  padding: 11px 12px;
-  line-height: 1.6;
+  padding: 12px 13px;
+  line-height: 1.65;
   overflow-wrap: anywhere;
   box-shadow: var(--oc-shadow-sm);
+  position: relative;
 }
 
 .oc-message-item.user .oc-message-body {
   background: var(--oc-color-user-bubble);
   color: var(--oc-color-user-text);
-  border-color: transparent;
+  border-color: color-mix(in srgb, var(--oc-color-primary) 42%, transparent);
+  box-shadow: 0 16px 30px color-mix(in srgb, var(--oc-color-primary) 30%, transparent);
 }
 
 .oc-message-item.system .oc-message-body {
@@ -267,11 +271,11 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 1px 8px;
-  font-size: 11px;
-  border: 1px solid color-mix(in srgb, var(--oc-color-border) 78%, transparent);
+  padding: 2px 8px;
+  font-size: 10px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 72%, transparent);
   color: var(--oc-color-muted);
-  background: color-mix(in srgb, var(--oc-color-panel) 88%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel) 80%, transparent);
 }
 
 .oc-message-status.is-streaming,
@@ -299,25 +303,31 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
 .oc-message-images {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .oc-message-image {
   width: 100%;
   height: 160px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  border: 1px solid color-mix(in srgb, var(--oc-color-border) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 78%, transparent);
+  transition: transform var(--oc-transition), box-shadow var(--oc-transition);
+}
+
+.oc-message-image:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--oc-shadow-sm);
 }
 
 .oc-message-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: flex-end;
   opacity: 0;
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   transition: opacity var(--oc-transition), transform var(--oc-transition);
 }
 
@@ -327,13 +337,13 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
 }
 
 .oc-message-actions button {
-  border: 1px solid var(--oc-color-border);
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 82%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--oc-color-panel) 72%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 82%, transparent);
   color: var(--oc-color-muted);
   cursor: pointer;
   font-size: 11px;
-  padding: 3px 8px;
+  padding: 4px 9px;
 }
 
 .oc-message-actions button:hover {
@@ -358,10 +368,11 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
   z-index: 60;
   display: grid;
   min-width: 160px;
-  border: 1px solid var(--oc-color-border);
-  background: var(--oc-color-panel);
-  border-radius: 10px;
-  padding: 5px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 78%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 6px;
   gap: 4px;
   box-shadow: var(--oc-shadow-md);
 }
@@ -385,13 +396,45 @@ async function handleMenu(action: 'copy' | 'copy-code' | 'quote' | 'delete'): Pr
 }
 
 :deep(pre) {
-  padding: 10px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--oc-color-panel) 55%, black 8%);
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 72%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 84%, transparent);
   overflow-x: auto;
 }
 
+:deep(code) {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, monospace;
+}
+
+:deep(:not(pre) > code) {
+  font-size: 12px;
+  border-radius: 6px;
+  padding: 1px 5px;
+  border: 1px solid color-mix(in srgb, var(--oc-color-border) 74%, transparent);
+  background: color-mix(in srgb, var(--oc-color-primary-soft) 58%, transparent);
+}
+
+:deep(blockquote) {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-left: 3px solid color-mix(in srgb, var(--oc-color-primary) 44%, transparent);
+  background: color-mix(in srgb, var(--oc-color-panel-elevated) 74%, transparent);
+  border-radius: 0 8px 8px 0;
+}
+
 @media (max-width: 900px) {
+  .oc-message-item {
+    gap: 8px;
+  }
+
+  .oc-message-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+
   .oc-message-actions {
     opacity: 1;
     transform: none;
